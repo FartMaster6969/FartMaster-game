@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Fart Master</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            padding: 50px;
+        }
+        #energyBar {
+            width: 300px;
+            height: 20px;
+            background: #333;
+            border: 2px solid #fff;
+            margin: 20px auto;
+        }
+        #energy {
+            height: 100%;
+            background: #00cc00;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #score, #message, #tokenInfo {
+            font-size: 24px;
+            margin: 10px;
+        }
+        a { color: #00cc00; }
+    </style>
+</head>
+<body>
+    <h1>Fart Master</h1>
+    <p id="score">FMC: 0</p>
+    <div id="energyBar">
+        <div id="energy"></div>
+    </div>
+    <p id="message">Eat beans to charge energy!</p>
+    <button onclick="eatBeans()">Eat Beans</button>
+    <button onclick="fart()">Release a Fart!</button>
+    <p id="tokenInfo">FartMaster Coin (FMC) Address: <span id="tokenAddress">[Launching soon]</span></p>
+    <p><a href="https://twitter.com/FartMasterCoin">Följ oss på Twitter för updates!</a></p>
+
+    <script>
+        let score = 0;
+        let energy = 0;
+        const maxEnergy = 100;
+        const energyBar = document.getElementById("energy");
+        const scoreDisplay = document.getElementById("score");
+        const messageDisplay = document.getElementById("message");
+        const tokenAddress = document.getElementById("tokenAddress");
+
+        function eatBeans() {
+            if (energy < maxEnergy) {
+                energy += 20;
+                energyBar.style.width = energy + "%";
+                messageDisplay.innerText = "Yum, beans! Energy: " + energy;
+            }
+            if (energy >= maxEnergy) {
+                messageDisplay.innerText = "Fully charged – time to fart!";
+            }
+            if (energy > maxEnergy + 20) {
+                explode();
+            }
+        }
+
+        function fart() {
+            if (energy >= maxEnergy) {
+                let fartPoints = Math.floor(Math.random() * 50) + 50;
+                score += fartPoints;
+                scoreDisplay.innerText = "FMC: " + score;
+                messageDisplay.innerText = "Prrrrt! You got " + fartPoints + " FMC!";
+                energy = 0;
+                energyBar.style.width = "0%";
+            } else if (energy > 0) {
+                messageDisplay.innerText = "Not charged enough – eat more!";
+            } else {
+                messageDisplay.innerText = "No energy, eat beans!";
+            }
+        }
+
+        function explode() {
+            score -= 50;
+            energy = 0;
+            energyBar.style.width = "0%";
+            scoreDisplay.innerText = "FMC: " + score;
+            messageDisplay.innerText = "BOOM! You lost 50 FMC!";
+        }
+
+        // Lägg till token-adress efter lansering
+        function updateTokenAddress() {
+            tokenAddress.innerText = "ABC123...xyz"; // Ersätt med din Pump.fun-adress
+        }
+        // Kör updateTokenAddress() efter lansering genom att ta bort kommentaren nedan
+        // updateTokenAddress();
+    </script>
+</body>
+</html>

@@ -10,6 +10,11 @@
             text-align: center;
             padding: 50px;
         }
+        #character {
+            font-size: 100px;
+            margin: 20px;
+            transition: transform 0.3s;
+        }
         #energyBar {
             width: 300px;
             height: 20px;
@@ -22,6 +27,20 @@
             background: #00cc00;
             width: 0%;
             transition: width 0.3s;
+        }
+        #fartCloud {
+            font-size: 50px;
+            color: #fff;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: floatAway 2s ease-out forwards;
+        }
+        @keyframes floatAway {
+            0% { opacity: 1; top: 50%; }
+            100% { opacity: 0; top: 20%; }
         }
         button {
             padding: 15px 30px;
@@ -43,12 +62,14 @@
 <body>
     <h1>Fart Master</h1>
     <p id="score">FMC: 0</p>
+    <div id="character">👨‍🦳</div> <!-- Placeholder för gubben (en äldre man-emoji) -->
     <div id="energyBar">
         <div id="energy"></div>
     </div>
     <p id="message">Eat beans to charge energy!</p>
     <button onclick="eatBeans()">Eat Beans</button>
     <button onclick="fart()">Release a Fart!</button>
+    <div id="fartCloud">💨</div>
     <p id="tokenInfo">FartMaster Coin (FMC) Address: <span id="tokenAddress">[Launching soon]</span></p>
     <p><a href="https://twitter.com/FartMasterCoin">Följ oss på Twitter för updates!</a></p>
 
@@ -56,16 +77,20 @@
         let score = 0;
         let energy = 0;
         const maxEnergy = 100;
+        const character = document.getElementById("character");
         const energyBar = document.getElementById("energy");
         const scoreDisplay = document.getElementById("score");
         const messageDisplay = document.getElementById("message");
         const tokenAddress = document.getElementById("tokenAddress");
+        const fartCloud = document.getElementById("fartCloud");
 
         function eatBeans() {
             if (energy < maxEnergy) {
                 energy += 20;
                 energyBar.style.width = energy + "%";
+                character.innerText = "👨‍🦳🍳"; // Gubben äter (emoji för mat)
                 messageDisplay.innerText = "Yum, beans! Energy: " + energy;
+                setTimeout(() => character.innerText = "👨‍🦳", 500); // Återställ efter 0.5 sekunder
             }
             if (energy >= maxEnergy) {
                 messageDisplay.innerText = "Fully charged – time to fart!";
@@ -83,6 +108,12 @@
                 messageDisplay.innerText = "Prrrrt! You got " + fartPoints + " FMC!";
                 energy = 0;
                 energyBar.style.width = "0%";
+                character.style.transform = "scale(1.1)"; // Gubben "hoppar" lite
+                fartCloud.style.opacity = 1; // Visa gasmoln
+                setTimeout(() => {
+                    character.style.transform = "scale(1)";
+                    fartCloud.style.opacity = 0; // Dölj gasmoln efter 2 sekunder
+                }, 2000);
             } else if (energy > 0) {
                 messageDisplay.innerText = "Not charged enough – eat more!";
             } else {
@@ -96,6 +127,8 @@
             energyBar.style.width = "0%";
             scoreDisplay.innerText = "FMC: " + score;
             messageDisplay.innerText = "BOOM! You lost 50 FMC!";
+            character.innerText = "👨‍🦳😵"; // Gubben ser yr ut
+            setTimeout(() => character.innerText = "👨‍🦳", 1000); // Återställ efter 1 sekund
         }
 
         // Lägg till token-adress efter lansering

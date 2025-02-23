@@ -37,6 +37,7 @@
     let highestRank = "Fart Newbie";
     let coinAngle = 0;
     let twitterIconX, twitterIconY;
+    let pumpfunIconX, pumpfunIconY;
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -49,8 +50,10 @@
       for (let i = 0; i < 5; i++) {
         clouds.push(new Cloud());
       }
-      twitterIconX = width - 50; // Nere till höger
+      twitterIconX = width - 80; // Flyttar lite för att ge plats åt Pump.fun
       twitterIconY = height - 30;
+      pumpfunIconX = width - 40; // Bredvid Twitter-ikonen
+      pumpfunIconY = height - 30;
     }
 
     function draw() {
@@ -157,7 +160,9 @@
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
         drawCoin(width / 2, 65);
-        drawTwitterIcon(twitterIconX, twitterIconY);
+        textSize(16);
+        fill(0);
+        text("ca: soon", width / 2, 95); // Text under FartMasterCoin
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -187,6 +192,10 @@
         text(`Rank: ${highestRank}`, width / 2, height / 2 + 20);
         document.getElementById("restartButton").style.display = "block";
       }
+
+      // Ikoner visas alltid
+      drawTwitterIcon(twitterIconX, twitterIconY);
+      drawPumpfunIcon(pumpfunIconX, pumpfunIconY);
     }
 
     function drawCoin(x, y) {
@@ -220,10 +229,26 @@
       pop();
     }
 
+    function drawPumpfunIcon(x, y) {
+      push();
+      translate(x, y);
+      fill(255, 165, 0); // Orange för Pump.fun
+      ellipse(0, 0, 30, 30);
+      fill(255);
+      textSize(18);
+      textAlign(CENTER, CENTER);
+      text("💪", 0, 2); // Muskelsymbol som placeholder
+      pop();
+    }
+
     function mousePressed() {
-      let d = dist(mouseX, mouseY, twitterIconX, twitterIconY);
-      if (d < 15) {
-        window.open("https://x.com/FartMasterGame", "_blank"); // Din Twitter-länk
+      let twitterDist = dist(mouseX, mouseY, twitterIconX, twitterIconY);
+      let pumpfunDist = dist(mouseX, mouseY, pumpfunIconX, pumpfunIconY);
+      if (twitterDist < 15) {
+        window.open("https://x.com/FartMasterGame", "_blank");
+      }
+      if (pumpfunDist < 15) {
+        window.open("https://pump.fun/DIN_PUMP_FUN_LÄNK", "_blank"); // Placeholder, byt sen
       }
     }
 
@@ -527,8 +552,10 @@
 
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
-      twitterIconX = width - 50;
+      twitterIconX = width - 80;
       twitterIconY = height - 30;
+      pumpfunIconX = width - 40;
+      pumpfunIconY = height - 30;
     }
   </script>
 </body>

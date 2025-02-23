@@ -31,6 +31,7 @@
     let fartEffect = 0;
     let fartScore = 0;
     let rank = "Pruttlärling";
+    let highestRank = "Pruttlärling"; // Sparar högsta uppnådda rank
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -83,19 +84,18 @@
         textSize(20);
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
-        text(`Rank: ${rank}`, width / 2, 30);
+        text(`Rank: ${highestRank}`, width / 2, 30);
       } else if (fartScene) {
-        // Fis-scen
         player.showDead();
         if (fartEffect > 0) {
-          textSize(50 + fartEffect * 3); // Mindre storleksökning per frame
-          fill(139, 69, 19, fartEffect * 3); // Saktare blekning
+          textSize(50 + fartEffect * 3);
+          fill(139, 69, 19, fartEffect * 3);
           text("💨", player.x + 50, player.y - fartEffect * 5);
-          fartScore = Math.floor((60 - fartEffect) * fuelCount * 0.5); // Poäng räknas upp långsammare
+          fartScore = Math.floor((60 - fartEffect) * fuelCount * 0.5);
           textSize(30);
           fill(0);
           text(`Fart Score: ${fartScore}`, width / 2, height / 2 + 20);
-          if (frameCount % 3 === 0) fartEffect--; // Saktar ner med 1 var tredje frame
+          if (frameCount % 3 === 0) fartEffect--;
           if (fartEffect <= 0) {
             fartScene = false;
             updateRank();
@@ -103,13 +103,12 @@
           }
         }
       } else {
-        // Resultat
         textSize(50);
         fill(255, 0, 0);
         text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
         textSize(30);
         fill(0);
-        text(`Rank: ${rank}`, width / 2, height / 2 + 20);
+        text(`Rank: ${highestRank}`, width / 2, height / 2 + 20);
         document.getElementById("restartButton").style.display = "block";
       }
     }
@@ -117,15 +116,16 @@
     function endGame() {
       gameOver = true;
       fartScene = true;
-      fartEffect = map(fuelCount, 0, 50, 20, 60); // Startvärde för fis
-      fartScore = 0; // Nollställ poäng vid start av fis-scen
+      fartEffect = map(fuelCount, 0, 50, 20, 60);
+      fartScore = 0;
     }
 
     function updateRank() {
-      if (fartScore >= 5000) rank = "Superfartmästare";
-      else if (fartScore >= 2000) rank = "Fartmästare";
-      else if (fartScore >= 750) rank = "Gasexpert";
-      else rank = "Pruttlärling";
+      // Kollar bara om vi ska gå upp i rank, aldrig ner
+      if (fartScore >= 10000) highestRank = "Superfartmästare"; // Mycket svårare!
+      else if (fartScore >= 5000 && highestRank != "Superfartmästare") highestRank = "Fartmästare";
+      else if (fartScore >= 1500 && highestRank != "Superfartmästare" && highestRank != "Fartmästare") highestRank = "Gasexpert";
+      else if (highestRank == "Pruttlärling") highestRank = "Pruttlärling";
     }
 
     function keyPressed() {
@@ -150,6 +150,7 @@
       fartEffect = 0;
       fartScore = 0;
       document.getElementById("restartButton").style.display = "none";
+      // Behåller highestRank oförändrad
     }
 
     class Player {

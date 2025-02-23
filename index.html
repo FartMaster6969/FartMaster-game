@@ -78,9 +78,11 @@
 
         if (player.jumpFart > 0) {
           push();
+          translate(player.x - 20, player.y + 40); // Placering bakom gubben
+          scale(-1, 1); // Vänder emojin horisontellt
           textSize(20 + player.jumpFart * 2);
           fill(0, 255, 0, player.jumpFart * 20);
-          text("💨", player.x - 20, player.y + 40);
+          text("💨", 0, 0); // Rita på ursprung efter transform
           pop();
           player.jumpFart--;
         }

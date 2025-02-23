@@ -3,6 +3,10 @@
 <head>
   <title>Fart Master</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
+  <style>
+    body { margin: 0; padding: 0; overflow: hidden; }
+    canvas { display: block; }
+  </style>
 </head>
 <body>
   <script>
@@ -12,30 +16,35 @@
     let fuelCount = 0;
     let gameOver = false;
     let highScore = 0;
+    let gameStarted = false;
 
     function setup() {
-      createCanvas(800, 400);
+      createCanvas(windowWidth, windowHeight); // Använder hela skärmen
       player = new Player();
       textAlign(CENTER);
     }
 
     function draw() {
       background(150, 200, 255); // Ljusblå bakgrund
-      
-      if (!gameOver) {
-        // Rita marken
-        fill(100, 200, 100);
-        rect(0, height - 50, width, 50);
+      fill(100, 200, 100); // Mark
+      rect(0, height - 100, width, 100);
 
-        // Uppdatera och visa spelare
+      if (!gameStarted) {
+        // Startskärm
+        textSize(40);
+        fill(0);
+        text("Hoppa för att starta!", width / 2, height / 2);
+        player.show();
+        player.updateStart(); // Spelaren står still innan start
+        if (keyIsDown(UP_ARROW)) gameStarted = true;
+      } else if (!gameOver) {
+        // Spel pågår
         player.show();
         player.update();
 
-        // Slumpmässigt spawn av fuel och hinder
-        if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5))); // Olika fuel-värden
+        if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5)));
         if (frameCount % 100 === 0) obstacles.push(new Obstacle());
 
-        // Hantera fuel
         for (let i = fuels.length - 1; i >= 0; i--) {
           fuels[i].show();
           fuels[i].update();
@@ -43,10 +52,9 @@
             fuelCount += fuels[i].value;
             fuels.splice(i, 1);
           }
-          if (fuels[i].x < -20) fuels.splice(i, 1); // Ta bort om utanför skärmen
+          if (fuels[i].x < -20) fuels.splice(i, 1);
         }
 
-        // Hantera hinder
         for (let i = obstacles.length - 1; i >= 0; i--) {
           obstacles[i].show();
           obstacles[i].update();
@@ -56,7 +64,6 @@
           if (obstacles[i].x < -40) obstacles.splice(i, 1);
         }
 
-        // Visa fuel och highscore
         fill(0);
         textSize(20);
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
@@ -68,27 +75,28 @@
       gameOver = true;
       let fartScore = calculateFart(fuelCount);
       if (fartScore > highScore) highScore = fartScore;
-      textSize(40);
+      textSize(50);
       fill(255, 0, 0);
-      text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2);
-      textSize(20);
-      text("Tryck R för att starta om", width / 2, height / 2 + 40);
+      text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
+      textSize(30);
+      text("Tryck R för att köra igen", width / 2, height / 2 + 40);
     }
 
     function calculateFart(fuel) {
-      if (fuel >= 50) return 10000;      // Episk "Fartocalypse"
-      if (fuel >= 30) return 2000;       // Stor fis
-      if (fuel >= 15) return 500;        // Medium fis
-      return 100;                        // Liten prutt
+      if (fuel >= 50) return 10000; // Episk "Fartocalypse"
+      if (fuel >= 30) return 2000;  // Stor fis
+      if (fuel >= 15) return 500;   // Medium fis
+      return 100;                   // Liten prutt
     }
 
     function keyPressed() {
-      if (keyCode === UP_ARROW && !gameOver) player.jump();
+      if (keyCode === UP_ARROW && gameStarted && !gameOver) player.jump();
       if (key === 'r' && gameOver) resetGame();
     }
 
     function resetGame() {
       gameOver = false;
+      gameStarted = false;
       fuelCount = 0;
       fuels = [];
       obstacles = [];
@@ -98,11 +106,11 @@
     class Player {
       constructor() {
         this.x = 100;
-        this.y = height - 80;
+        this.y = height - 130;
         this.velocity = 0;
         this.gravity = 0.7;
-        this.width = 30;
-        this.height = 30;
+        this.width = 40;
+        this.height = 40;
       }
       show() {
         fill(255, 0, 0); // Röd spelare
@@ -111,16 +119,19 @@
       update() {
         this.velocity += this.gravity;
         this.y += this.velocity;
-        if (this.y > height - 80) {
-          this.y = height - 80;
+        if (this.y > height - 130) {
+          this.y = height - 130;
           this.velocity = 0;
         }
-        if (keyIsDown(LEFT_ARROW)) this.x -= 5;
-        if (keyIsDown(RIGHT_ARROW)) this.x += 5;
+        if (keyIsDown(LEFT_ARROW)) this.x -= 6;
+        if (keyIsDown(RIGHT_ARROW)) this.x += 6;
         this.x = constrain(this.x, 0, width - this.width);
       }
+      updateStart() {
+        this.y = height - 130; // Står still på marken innan start
+      }
       jump() {
-        if (this.y === height - 80) this.velocity = -15;
+        if (this.y === height - 130) this.velocity = -18; // Högre hopp
       }
       hits(obj) {
         let px = this.x;
@@ -134,34 +145,38 @@
     class Fuel {
       constructor(value) {
         this.x = width;
-        this.y = random(height - 150, height - 80);
+        this.y = random(height - 250, height - 130);
         this.value = value;
-        this.w = 20;
-        this.h = 20;
+        this.w = 25;
+        this.h = 25;
       }
       show() {
-        fill(0, 255, 0); // Grön fuel (bönor)
+        fill(0, 255, 0); // Grön fuel
         rect(this.x, this.y, this.w, this.h);
       }
       update() {
-        this.x -= 4;
+        this.x -= 5;
       }
     }
 
     class Obstacle {
       constructor() {
         this.x = width;
-        this.y = height - 80;
-        this.w = 40;
-        this.h = 40;
+        this.y = height - 130;
+        this.w = 50;
+        this.h = 50;
       }
       show() {
         fill(0, 0, 255); // Blå hinder
         rect(this.x, this.y, this.w, this.h);
       }
       update() {
-        this.x -= 4;
+        this.x -= 5;
       }
+    }
+
+    function windowResized() {
+      resizeCanvas(windowWidth, windowHeight); // Anpassar till skärmstorlek
     }
   </script>
 </body>

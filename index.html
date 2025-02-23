@@ -18,7 +18,7 @@
   </style>
 </head>
 <body>
-  <button id="restartButton" onclick="resetGame()">Starta om</button>
+  <button id="restartButton" onclick="resetGame()">Restart</button>
   <script>
     let player;
     let fuels = [];
@@ -30,8 +30,8 @@
     let fartScene = false;
     let fartEffect = 0;
     let fartScore = 0;
-    let rank = "Pruttlärling";
-    let highestRank = "Pruttlärling"; // Sparar högsta uppnådda rank
+    let rank = "Fart Newbie";
+    let highestRank = "Fart Newbie";
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -46,9 +46,22 @@
       rect(0, height - 100, width, 100);
 
       if (!gameStarted) {
+        // Meny/Startskärm
         textSize(40);
         fill(0);
-        text("Tryck MELLANSLAG för att starta!", width / 2, height / 2);
+        text("Fart Master", width / 2, height / 2 - 150);
+        textSize(30);
+        text("Press SPACE to start!", width / 2, height / 2 - 100);
+        textSize(20);
+        text("Fart Fuel Sources:", width / 2, height / 2 - 50);
+        text("🌮 Taco: 1-2 Fuel", width / 2, height / 2 - 20);
+        text("🥬 Cabbage: 3-4 Fuel", width / 2, height / 2 + 10);
+        text("🌶️ Chili: 5 Fuel", width / 2, height / 2 + 40);
+        text("Ranks:", width / 2, height / 2 + 80);
+        text("Fart Newbie: 0-1499", width / 2, height / 2 + 110);
+        text("Gas Pro: 1500-4999", width / 2, height / 2 + 140);
+        text("Fart Master: 5000-9999", width / 2, height / 2 + 170);
+        text("Super Fart Legend: 10000+", width / 2, height / 2 + 200);
         player.show();
         player.updateStart();
       } else if (!gameOver) {
@@ -121,11 +134,10 @@
     }
 
     function updateRank() {
-      // Kollar bara om vi ska gå upp i rank, aldrig ner
-      if (fartScore >= 10000) highestRank = "Superfartmästare"; // Mycket svårare!
-      else if (fartScore >= 5000 && highestRank != "Superfartmästare") highestRank = "Fartmästare";
-      else if (fartScore >= 1500 && highestRank != "Superfartmästare" && highestRank != "Fartmästare") highestRank = "Gasexpert";
-      else if (highestRank == "Pruttlärling") highestRank = "Pruttlärling";
+      if (fartScore >= 10000) highestRank = "Super Fart Legend";
+      else if (fartScore >= 5000 && highestRank != "Super Fart Legend") highestRank = "Fart Master";
+      else if (fartScore >= 1500 && highestRank != "Super Fart Legend" && highestRank != "Fart Master") highestRank = "Gas Pro";
+      else if (highestRank == "Fart Newbie") highestRank = "Fart Newbie";
     }
 
     function keyPressed() {
@@ -150,7 +162,6 @@
       fartEffect = 0;
       fartScore = 0;
       document.getElementById("restartButton").style.display = "none";
-      // Behåller highestRank oförändrad
     }
 
     class Player {

@@ -3,6 +3,7 @@
 <head>
   <title>Fart Master</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/addons/p5.sound.min.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
     canvas { display: block; }
@@ -33,6 +34,12 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
+    let jumpSound, deathSound;
+
+    function preload() {
+      jumpSound = loadSound('jump_fart.mp3'); // Lokal fil i repot
+      deathSound = loadSound('death_fart.mp3'); // Lokal fil i repot
+    }
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -177,6 +184,7 @@
       fartScene = true;
       fartEffect = map(fuelCount, 0, 50, 20, 60);
       fartScore = 0;
+      if (deathSound) deathSound.play();
     }
 
     function updateRank() {
@@ -332,6 +340,7 @@
           this.velocity = -12;
           this.jumpsLeft--;
           this.jumpFart = 10;
+          if (jumpSound) jumpSound.play();
         }
       }
       hits(obj) {

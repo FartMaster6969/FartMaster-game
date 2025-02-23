@@ -11,113 +11,156 @@
     let obstacles = [];
     let fuelCount = 0;
     let gameOver = false;
+    let highScore = 0;
 
     function setup() {
       createCanvas(800, 400);
       player = new Player();
+      textAlign(CENTER);
     }
 
     function draw() {
-      background(200);
+      background(150, 200, 255); // Ljusblå bakgrund
       
       if (!gameOver) {
+        // Rita marken
+        fill(100, 200, 100);
+        rect(0, height - 50, width, 50);
+
+        // Uppdatera och visa spelare
         player.show();
         player.update();
 
-        if (frameCount % 60 === 0) fuels.push(new Fuel());
-        if (frameCount % 120 === 0) obstacles.push(new Obstacle());
+        // Slumpmässigt spawn av fuel och hinder
+        if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5))); // Olika fuel-värden
+        if (frameCount % 100 === 0) obstacles.push(new Obstacle());
 
+        // Hantera fuel
         for (let i = fuels.length - 1; i >= 0; i--) {
           fuels[i].show();
+          fuels[i].update();
           if (player.hits(fuels[i])) {
             fuelCount += fuels[i].value;
             fuels.splice(i, 1);
           }
+          if (fuels[i].x < -20) fuels.splice(i, 1); // Ta bort om utanför skärmen
         }
 
+        // Hantera hinder
         for (let i = obstacles.length - 1; i >= 0; i--) {
           obstacles[i].show();
           obstacles[i].update();
           if (player.hits(obstacles[i])) {
             endGame();
           }
+          if (obstacles[i].x < -40) obstacles.splice(i, 1);
         }
+
+        // Visa fuel och highscore
+        fill(0);
+        textSize(20);
+        text(`Fart Fuel: ${fuelCount}`, 100, 30);
+        text(`Highscore: ${highScore}`, width - 100, 30);
       }
     }
 
     function endGame() {
       gameOver = true;
       let fartScore = calculateFart(fuelCount);
-      textSize(32);
-      textAlign(CENTER);
-      text(`Fart Score: ${fartScore}`, width / 2, height / 2);
+      if (fartScore > highScore) highScore = fartScore;
+      textSize(40);
+      fill(255, 0, 0);
+      text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2);
+      textSize(20);
+      text("Tryck R för att starta om", width / 2, height / 2 + 40);
     }
 
     function calculateFart(fuel) {
-      if (fuel > 60) return 10000;
-      if (fuel > 30) return 2000;
-      if (fuel > 10) return 500;
-      return 100;
+      if (fuel >= 50) return 10000;      // Episk "Fartocalypse"
+      if (fuel >= 30) return 2000;       // Stor fis
+      if (fuel >= 15) return 500;        // Medium fis
+      return 100;                        // Liten prutt
     }
 
     function keyPressed() {
-      if (keyCode === UP_ARROW) player.jump();
+      if (keyCode === UP_ARROW && !gameOver) player.jump();
+      if (key === 'r' && gameOver) resetGame();
+    }
+
+    function resetGame() {
+      gameOver = false;
+      fuelCount = 0;
+      fuels = [];
+      obstacles = [];
+      player = new Player();
     }
 
     class Player {
       constructor() {
         this.x = 100;
-        this.y = height - 50;
+        this.y = height - 80;
         this.velocity = 0;
-        this.gravity = 0.6;
+        this.gravity = 0.7;
+        this.width = 30;
+        this.height = 30;
       }
       show() {
-        fill(255, 0, 0);
-        rect(this.x, this.y, 30, 30);
+        fill(255, 0, 0); // Röd spelare
+        rect(this.x, this.y, this.width, this.height);
       }
       update() {
         this.velocity += this.gravity;
         this.y += this.velocity;
-        if (this.y > height - 50) this.y = height - 50, this.velocity = 0;
+        if (this.y > height - 80) {
+          this.y = height - 80;
+          this.velocity = 0;
+        }
         if (keyIsDown(LEFT_ARROW)) this.x -= 5;
         if (keyIsDown(RIGHT_ARROW)) this.x += 5;
+        this.x = constrain(this.x, 0, width - this.width);
       }
       jump() {
-        if (this.y === height - 50) this.velocity = -12;
+        if (this.y === height - 80) this.velocity = -15;
       }
       hits(obj) {
-        return collideRectRect(this.x, this.y, 30, 30, obj.x, obj.y, obj.w, obj.h);
+        let px = this.x;
+        let py = this.y;
+        let ox = obj.x;
+        let oy = obj.y;
+        return (px < ox + obj.w && px + this.width > ox && py < oy + obj.h && py + this.height > oy);
       }
     }
 
     class Fuel {
-      constructor() {
+      constructor(value) {
         this.x = width;
-        this.y = random(height - 100);
-        this.value = 1;
+        this.y = random(height - 150, height - 80);
+        this.value = value;
         this.w = 20;
         this.h = 20;
       }
       show() {
-        fill(0, 255, 0);
+        fill(0, 255, 0); // Grön fuel (bönor)
         rect(this.x, this.y, this.w, this.h);
-        this.x -= 3;
+      }
+      update() {
+        this.x -= 4;
       }
     }
 
     class Obstacle {
       constructor() {
         this.x = width;
-        this.y = height - 50;
+        this.y = height - 80;
         this.w = 40;
         this.h = 40;
       }
       show() {
-        fill(0, 0, 255);
+        fill(0, 0, 255); // Blå hinder
         rect(this.x, this.y, this.w, this.h);
       }
       update() {
-        this.x -= 3;
+        this.x -= 4;
       }
     }
   </script>

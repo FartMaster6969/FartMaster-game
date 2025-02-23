@@ -67,18 +67,16 @@
         player.show();
         player.update();
 
+        // Rita jumpFart med push/pop för att isolera transparens
         if (player.jumpFart > 0) {
+          push();
           fill(0, 255, 0, player.jumpFart * 20);
           ellipse(player.x - 15, player.y + 40, player.jumpFart * 3, player.jumpFart * 2);
+          pop();
           player.jumpFart--;
         }
 
-        if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5)));
-        if (frameCount % 100 === 0) {
-          if (random(1) > 0.5) obstacles.push(new Obstacle(true));
-          else obstacles.push(new Obstacle(false));
-        }
-
+        // Rita fuel och hinder med full opacitet
         for (let i = fuels.length - 1; i >= 0; i--) {
           fuels[i].show();
           fuels[i].update();
@@ -98,7 +96,7 @@
           if (obstacles[i].x < -obstacles[i].w) obstacles.splice(i, 1);
         }
 
-        fill(0);
+        fill(0); // Säkerställer ogenomskinlig text
         textSize(20);
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
@@ -106,12 +104,14 @@
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
+          push();
           textSize(50 + fartEffect * 3);
           fill(0, 255, 0, fartEffect * 3);
           text("💨", player.x + 50, player.y - fartEffect * 5);
+          pop();
           fartScore = Math.floor((60 - fartEffect) * fuelCount * 0.5);
-          textSize(30);
           fill(0);
+          textSize(30);
           text(`Fart Score: ${fartScore}`, width / 2, height / 2 + 20);
           if (frameCount % 3 === 0) fartEffect--;
           if (fartEffect <= 0) {
@@ -146,10 +146,10 @@
     }
 
     function getCharIdFromRank(rank) {
-      if (rank === "Super Fart Legend") return 3; // Prutt-Piraten
-      if (rank === "Fart Master") return 2; // Farting Flamingo
-      if (rank === "Gas Pro") return 1; // Turbo Tarm
-      return 0; // Gasbag Gubbe
+      if (rank === "Super Fart Legend") return 3;
+      if (rank === "Fart Master") return 2;
+      if (rank === "Gas Pro") return 1;
+      return 0;
     }
 
     function keyPressed() {
@@ -187,7 +187,7 @@
         this.jumpsLeft = 2;
         this.charId = charId;
         this.legAngle = 0;
-        this.jumpFart = 0; // Flyttat hit från global
+        this.jumpFart = 0;
       }
       show() {
         push();
@@ -321,10 +321,13 @@
         this.h = 25;
       }
       show() {
+        push();
         textSize(25);
+        fill(0); // Full opacitet för fuel
         if (this.value <= 2) text("🌮", this.x, this.y + 25);
         else if (this.value <= 4) text("🥬", this.x, this.y + 25);
         else text("🌶️", this.x, this.y + 25);
+        pop();
       }
       update() {
         this.x -= 5;
@@ -340,8 +343,11 @@
         this.isBig = isBig;
       }
       show() {
+        push();
         textSize(this.h);
+        fill(0); // Full opacitet för hinder
         text("🚽", this.x, this.y + this.h);
+        pop();
       }
       update() {
         this.x -= 5;

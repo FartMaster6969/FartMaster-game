@@ -22,8 +22,7 @@
       createCanvas(windowWidth, windowHeight); // Helskärm
       player = new Player();
       textAlign(CENTER);
-      // Sätt fokus på canvasen så tangenterna funkar direkt
-      window.focus();
+      window.focus(); // Säkerställer fokus för tangenter
     }
 
     function draw() {
@@ -35,7 +34,7 @@
         // Startskärm
         textSize(40);
         fill(0);
-        text("Tryck UPP för att starta!", width / 2, height / 2);
+        text("Tryck MELLANSLAG för att starta!", width / 2, height / 2);
         player.show();
         player.updateStart();
       } else if (!gameOver) {
@@ -91,7 +90,7 @@
     }
 
     function keyPressed() {
-      if (keyCode === UP_ARROW) {
+      if (key === ' ' || keyCode === 32) { // Mellanslag (Space)
         if (!gameStarted) {
           gameStarted = true; // Starta spelet
         } else if (!gameOver) {

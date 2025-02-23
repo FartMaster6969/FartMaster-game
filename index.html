@@ -3,7 +3,6 @@
 <head>
   <title>Fart Master</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/addons/p5.sound.min.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
     canvas { display: block; }
@@ -34,13 +33,6 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
-    let jumpSound, deathSound;
-
-    function preload() {
-      // Ladda fisljud från gratis online-källor
-      jumpSound = loadSound('https://www.myinstants.com/media/sounds/fart.mp3'); // Kort fis för hopp
-      deathSound = loadSound('https://www.myinstants.com/media/sounds/wet-fart.mp3'); // Våt fis för död
-    }
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -98,10 +90,10 @@
 
         if (frameCount % 50 === 0) {
           let chance = random(1);
-          if (chance < 0.80) fuels.push(new Fuel(1, "🫘")); // 80% bönor
-          else if (chance < 0.90) fuels.push(new Fuel(3, "🌮")); // 10% tacos
-          else if (chance < 0.97) fuels.push(new Fuel(3, "🥚")); // 7% ägg
-          else fuels.push(new Fuel(10, "🍺")); // 3% öl
+          if (chance < 0.80) fuels.push(new Fuel(1, "🫘"));
+          else if (chance < 0.90) fuels.push(new Fuel(3, "🌮"));
+          else if (chance < 0.97) fuels.push(new Fuel(3, "🥚"));
+          else fuels.push(new Fuel(10, "🍺"));
         }
         if (frameCount % 100 === 0) {
           obstacles.push(new Obstacle(random(1) > 0.5));
@@ -131,7 +123,7 @@
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
-        drawCoin(width / 2, 65); // Större logga under ranken
+        drawCoin(width / 2, 65);
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -163,20 +155,19 @@
       }
     }
 
-    // Funktion för att rita FartMasterCoin
     function drawCoin(x, y) {
       push();
       translate(x, y);
-      fill(255, 215, 0); // Guld
-      ellipse(0, 0, 40, 40); // Större mynt
-      fill(0, 255, 0); // Grön fis
+      fill(255, 215, 0);
+      ellipse(0, 0, 40, 40);
+      fill(0, 255, 0);
       textSize(20);
       textAlign(CENTER, CENTER);
-      text("💨", 0, 0); // Centrerad fis-emoji
+      text("💨", 0, 0);
       noFill();
-      stroke(200, 150, 0); // Mörkare guldkant
+      stroke(200, 150, 0);
       strokeWeight(2);
-      ellipse(0, 0, 42, 42); // Kant
+      ellipse(0, 0, 42, 42);
       noStroke();
       pop();
     }
@@ -186,7 +177,6 @@
       fartScene = true;
       fartEffect = map(fuelCount, 0, 50, 20, 60);
       fartScore = 0;
-      if (deathSound) deathSound.play(); // Spela dödljud
     }
 
     function updateRank() {
@@ -237,15 +227,12 @@
       show() {
         push();
         translate(this.x, this.y);
-        
         fill(150, 150, 150);
         rect(5, 20, 10, 20, 5);
         fill(255, 100, 0);
         ellipse(10, 40, 10, 15);
-        
         fill(0, 200, 0);
         rect(15, 20, 20, 30, 5);
-        
         fill(255, 0, 0);
         beginShape();
         vertex(15, 20);
@@ -253,39 +240,32 @@
         vertex(30 + sin(this.armAngle) * 5, 40);
         vertex(20 - sin(this.armAngle) * 5, 40);
         endShape(CLOSE);
-        
         fill(255, 200, 150);
         ellipse(25, 15, 20, 20);
-        
         fill(255, 215, 0);
         triangle(20, 10, 25, 5, 30, 10);
         ellipse(25, 10, 10, 5);
-        
         fill(255);
         ellipse(22, 13, 6, 6); ellipse(28, 13, 6, 6);
         if (frameCount % this.blinkTimer > 5) {
           fill(0);
           ellipse(22, 13, 3, 3); ellipse(28, 13, 3, 3);
         }
-        
         noFill();
         stroke(0);
         strokeWeight(2);
         arc(25, 18, 8, 4, 0, PI);
         noStroke();
-        
         stroke(0, 200, 0);
         strokeWeight(4);
         line(15, 25, 10 + sin(this.armAngle) * 5, 35);
         line(35, 25, 40 - sin(this.armAngle) * 5, 35);
         noStroke();
-        
         stroke(0, 200, 0);
         strokeWeight(4);
         line(20, 50, 20 + sin(this.legAngle) * 5, 60);
         line(30, 50, 30 - sin(this.legAngle) * 5, 60);
         noStroke();
-        
         pop();
         if (this.velocity === 0) {
           this.legAngle += 0.2;
@@ -296,15 +276,12 @@
       showDead() {
         push();
         translate(this.x, this.y);
-        
         fill(100, 100, 100);
         rect(5, 20, 10, 20, 5);
         fill(150, 50, 0);
         ellipse(10, 40, 8, 10);
-        
         fill(0, 150, 0);
         rect(15, 20, 20, 30, 5);
-        
         fill(200, 0, 0);
         beginShape();
         vertex(15, 20);
@@ -312,34 +289,27 @@
         vertex(30, 40);
         vertex(20, 40);
         endShape(CLOSE);
-        
         fill(200, 150, 100);
         ellipse(25, 15, 20, 20);
-        
         fill(200, 165, 0);
         triangle(20, 10, 25, 5, 30, 10);
         ellipse(25, 10, 10, 5);
-        
         stroke(0);
         strokeWeight(2);
         line(20, 13, 24, 13);
         line(26, 13, 30, 13);
         noStroke();
-        
         arc(25, 20, 8, 4, PI, TWO_PI);
-        
         stroke(0, 150, 0);
         strokeWeight(4);
         line(15, 25, 10, 35);
         line(35, 25, 40, 35);
         noStroke();
-        
         stroke(0, 150, 0);
         strokeWeight(4);
         line(20, 50, 20, 60);
         line(30, 50, 30, 60);
         noStroke();
-        
         pop();
       }
       update() {
@@ -362,7 +332,6 @@
           this.velocity = -12;
           this.jumpsLeft--;
           this.jumpFart = 10;
-          if (jumpSound) jumpSound.play(); // Spela hoppljud
         }
       }
       hits(obj) {

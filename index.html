@@ -50,9 +50,9 @@
       for (let i = 0; i < 5; i++) {
         clouds.push(new Cloud());
       }
-      twitterIconX = width - 80; // Flyttar lite för att ge plats åt Pump.fun
+      twitterIconX = width - 80;
       twitterIconY = height - 30;
-      pumpfunIconX = width - 40; // Bredvid Twitter-ikonen
+      pumpfunIconX = width - 40;
       pumpfunIconY = height - 30;
     }
 
@@ -162,7 +162,7 @@
         drawCoin(width / 2, 65);
         textSize(16);
         fill(0);
-        text("ca: soon", width / 2, 95); // Text under FartMasterCoin
+        text("ca: soon", width / 2, 95);
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -193,7 +193,6 @@
         document.getElementById("restartButton").style.display = "block";
       }
 
-      // Ikoner visas alltid
       drawTwitterIcon(twitterIconX, twitterIconY);
       drawPumpfunIcon(pumpfunIconX, pumpfunIconY);
     }
@@ -237,7 +236,7 @@
       fill(255);
       textSize(18);
       textAlign(CENTER, CENTER);
-      text("💪", 0, 2); // Muskelsymbol som placeholder
+      text("💊", 0, 2); // Piller som ikon
       pop();
     }
 

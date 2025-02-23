@@ -6,9 +6,19 @@
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
     canvas { display: block; }
+    #restartButton { 
+      position: absolute; 
+      top: 50%; 
+      left: 50%; 
+      transform: translate(-50%, 20px); 
+      padding: 10px 20px; 
+      font-size: 20px; 
+      display: none; 
+    }
   </style>
 </head>
 <body>
+  <button id="restartButton" onclick="resetGame()">Starta om</button>
   <script>
     let player;
     let fuels = [];
@@ -17,28 +27,27 @@
     let gameOver = false;
     let highScore = 0;
     let gameStarted = false;
+    let fartEffect = 0;
 
     function setup() {
-      createCanvas(windowWidth, windowHeight); // Helskärm
+      createCanvas(windowWidth, windowHeight);
       player = new Player();
       textAlign(CENTER);
-      window.focus(); // Säkerställer fokus för tangenter
+      window.focus();
     }
 
     function draw() {
-      background(150, 200, 255); // Ljusblå bakgrund
-      fill(100, 200, 100); // Mark
+      background(150, 200, 255);
+      fill(100, 200, 100);
       rect(0, height - 100, width, 100);
 
       if (!gameStarted) {
-        // Startskärm
         textSize(40);
         fill(0);
         text("Tryck MELLANSLAG för att starta!", width / 2, height / 2);
         player.show();
         player.updateStart();
       } else if (!gameOver) {
-        // Spel pågår
         player.show();
         player.update();
 
@@ -68,6 +77,15 @@
         textSize(20);
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
+      } else {
+        // Fis-effekt när du dör
+        if (fartEffect > 0) {
+          textSize(50 + fartEffect);
+          fill(139, 69, 19, fartEffect * 5); // Brunaktig fis-färg
+          text("💨", width / 2, height / 2 - 50);
+          fartEffect--;
+        }
+        document.getElementById("restartButton").style.display = "block";
       }
     }
 
@@ -78,8 +96,7 @@
       textSize(50);
       fill(255, 0, 0);
       text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
-      textSize(30);
-      text("Tryck R för att köra igen", width / 2, height / 2 + 40);
+      fartEffect = map(fuelCount, 0, 50, 10, 30); // Större fis vid mer fuel
     }
 
     function calculateFart(fuel) {
@@ -90,11 +107,11 @@
     }
 
     function keyPressed() {
-      if (key === ' ' || keyCode === 32) { // Mellanslag (Space)
+      if (key === ' ' || keyCode === 32) { // Mellanslag
         if (!gameStarted) {
-          gameStarted = true; // Starta spelet
+          gameStarted = true;
         } else if (!gameOver) {
-          player.jump(); // Hoppa i spelet
+          player.jump();
         }
       }
       if (key === 'r' && gameOver) resetGame();
@@ -107,6 +124,8 @@
       fuels = [];
       obstacles = [];
       player = new Player();
+      fartEffect = 0;
+      document.getElementById("restartButton").style.display = "none";
     }
 
     class Player {
@@ -119,8 +138,8 @@
         this.height = 40;
       }
       show() {
-        fill(255, 0, 0); // Röd spelare
-        rect(this.x, this.y, this.width, this.height);
+        textSize(40);
+        text("🏃", this.x, this.y + 40); // Löpare-emoji
       }
       update() {
         this.velocity += this.gravity;
@@ -134,7 +153,7 @@
         this.x = constrain(this.x, 0, width - this.width);
       }
       updateStart() {
-        this.y = height - 140; // Står still innan start
+        this.y = height - 140;
       }
       jump() {
         if (this.y === height - 140) this.velocity = -18;
@@ -157,8 +176,10 @@
         this.h = 25;
       }
       show() {
-        fill(0, 255, 0); // Grön fuel
-        rect(this.x, this.y, this.w, this.h);
+        textSize(25);
+        if (this.value <= 2) text("🌮", this.x, this.y + 25); // Taco för låg fuel
+        else if (this.value <= 4) text("🥬", this.x, this.y + 25); // Kål för medel
+        else text("🌶️", this.x, this.y + 25); // Chili för hög fuel
       }
       update() {
         this.x -= 5;
@@ -173,8 +194,8 @@
         this.h = 50;
       }
       show() {
-        fill(0, 0, 255); // Blå hinder
-        rect(this.x, this.y, this.w, this.h);
+        textSize(50);
+        text("🚽", this.x, this.y + 50); // Toalett som hinder
       }
       update() {
         this.x -= 5;

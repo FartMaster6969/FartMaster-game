@@ -123,7 +123,7 @@
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
-        drawCoin(width / 2, 50); // FartMasterCoin under ranken
+        drawCoin(width / 2, 65); // Större logga under ranken
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -160,14 +160,15 @@
       push();
       translate(x, y);
       fill(255, 215, 0); // Guld
-      ellipse(0, 0, 30, 30); // Mynt
+      ellipse(0, 0, 40, 40); // Större mynt (från 30 till 40)
       fill(0, 255, 0); // Grön fis
-      textSize(16);
-      text("💨", -8, 6); // Centrerad fis-emoji
+      textSize(20); // Större fis-emoji (från 16 till 20)
+      textAlign(CENTER, CENTER); // Centrerar texten
+      text("💨", 0, 0); // Perfekt centrerad i myntet
       noFill();
       stroke(200, 150, 0); // Mörkare guldkant
       strokeWeight(2);
-      ellipse(0, 0, 32, 32); // Kant för 3D-känsla
+      ellipse(0, 0, 42, 42); // Kant anpassad till större storlek
       noStroke();
       pop();
     }

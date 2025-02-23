@@ -24,46 +24,48 @@
         }
         #character {
             position: absolute;
-            width: 50px;
-            height: 50px;
-            font-size: 12px;
-            line-height: 16px;
+            width: 32px; /* Smalare för pixelart */
+            height: 32px;
+            font-size: 8px;
+            line-height: 8px;
             top: 50%;
             left: 50px;
-            background: #00ff00; /* Grön för gubbe */
-            color: #000;
+            background: #ff0000; /* Röd gubbe som Mario */
+            color: #0000ff; /* Blå detaljer */
             text-align: center;
             padding: 2px;
             box-sizing: border-box;
+            image-rendering: pixelated; /* Behåller pixelart-utseendet */
         }
         .fartCloud {
             position: absolute;
-            font-size: 12px;
-            bottom: -20px;
-            left: 15px;
+            font-size: 8px;
+            bottom: -10px;
+            left: 10px;
             opacity: 0;
-            color: #fff;
-            background: #ffffff;
-            animation: floatUp 1s ease-out forwards;
+            color: #ffffff;
+            background: #808080; /* Grå moln */
+            animation: floatUp 0.8s ease-out forwards;
         }
         @keyframes floatUp {
-            0% { opacity: 1; bottom: -20px; }
+            0% { opacity: 1; bottom: -10px; }
             100% { opacity: 0; bottom: 20px; }
         }
         .obstacle {
             position: absolute;
-            width: 50px;
-            height: 100px;
-            background: #8b4513; /* Brun för tegelmur */
+            width: 32px; /* Smalare för pixelart */
+            height: 64px;
+            background: #a0522d; /* Brun tegelmur som i Mario */
             right: 0;
-            line-height: 25px;
-            font-size: 12px;
-            color: #000;
+            line-height: 16px;
+            font-size: 8px;
+            color: #ffd700; /* Gul detalj för tegel */
             text-align: center;
             padding: 2px;
             box-sizing: border-box;
+            image-rendering: pixelated;
         }
-        #score, #message {
+        #score, #highScore, #message {
             font-size: 24px;
             margin: 10px;
         }
@@ -91,8 +93,9 @@
 <body>
     <h1>Flappy Fart</h1>
     <p id="score">FMC: 0</p>
+    <p id="highScore">High Score: 0</p>
     <div id="gameArea">
-        <div id="character">██<br>█<br>█</div> <!-- Pixelart-gubbe -->
+        <div id="character">█<br>██<br>█</div> <!-- Pixelart-gubbe (röd Mario-stil) -->
     </div>
     <p id="message"></p>
     <p id="tokenInfo">FartMaster Coin (FMC) Address: <span id="tokenAddress">[Launching soon]</span></p>
@@ -103,6 +106,7 @@
         const gameArea = document.getElementById("gameArea");
         const character = document.getElementById("character");
         const scoreDisplay = document.getElementById("score");
+        const highScoreDisplay = document.getElementById("highScore");
         const messageDisplay = document.getElementById("message");
         const tokenAddress = document.getElementById("tokenAddress");
         const restartButton = document.getElementById("restartButton");
@@ -115,6 +119,10 @@
         let isGameOver = false;
         let obstacleSpeed = 3;
         let obstacleInterval;
+
+        // Ladda high score från localStorage
+        let highScore = localStorage.getItem("flappyFartHighScore") || 0;
+        highScoreDisplay.innerText = "High Score: " + highScore;
 
         // Placera karaktären och hantera hopp
         function updateCharacter() {
@@ -150,9 +158,9 @@
         function showFartCloud() {
             const cloud = document.createElement("div");
             cloud.className = "fartCloud";
-            cloud.innerText = "█\n█"; // Pixelart-fismoln
+            cloud.innerText = "█"; // Enkel pixelart-fismoln
             character.appendChild(cloud);
-            setTimeout(() => cloud.remove(), 1000); // Ta bort efter 1 sekund
+            setTimeout(() => cloud.remove(), 800); // Ta bort efter 0.8 sekunder
         }
 
         // Skapa hinder (tegelmur)
@@ -160,7 +168,7 @@
             if (!isGameOver) {
                 const obstacle = document.createElement("div");
                 obstacle.className = "obstacle";
-                obstacle.innerText = "██\n██\n██\n██"; // Pixelart-tegelmur
+                obstacle.innerText = "█\n█\n█\n█"; // Pixelart-tegelmur (Mario-stil)
                 obstacle.style.top = Math.random() * 400 + "px"; // Slumpmässig höjd
                 gameArea.appendChild(obstacle);
 
@@ -169,17 +177,22 @@
                     if (!isGameOver) {
                         obstacleX -= obstacleSpeed;
                         obstacle.style.right = (400 - obstacleX) + "px";
-                        if (obstacleX < 50 && obstacleX > 0) { // Kollision med karaktär
+                        if (obstacleX < 32 && obstacleX > 0) { // Kollision med karaktär (justerat för mindre bredd)
                             const obstacleRect = obstacle.getBoundingClientRect();
                             const characterRect = character.getBoundingClientRect();
                             if (characterRect.top < obstacleRect.bottom && characterRect.bottom > obstacleRect.top) {
                                 gameOver();
                             }
                         }
-                        if (obstacleX < -50) {
+                        if (obstacleX < -32) {
                             obstacle.remove();
                             score += 10;
                             scoreDisplay.innerText = "FMC: " + score;
+                            if (score > highScore) {
+                                highScore = score;
+                                localStorage.setItem("flappyFartHighScore", highScore);
+                                highScoreDisplay.innerText = "High Score: " + highScore;
+                            }
                             clearInterval(moveObstacle);
                         }
                     } else {
@@ -212,7 +225,7 @@
             scoreDisplay.innerText = "FMC: 0";
             messageDisplay.innerText = "";
             restartButton.style.display = "none"; // Dölj restart-knappen
-            gameArea.innerHTML = '<div id="character">██<br>█<br>█</div>'; // Återställ pixelart-gubbe
+            gameArea.innerHTML = '<div id="character">█<br>██<br>█</div>'; // Återställ pixelart-gubbe
             character = document.getElementById("character");
             startGame();
         }

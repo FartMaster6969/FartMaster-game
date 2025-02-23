@@ -3,7 +3,6 @@
 <head>
   <title>Fart Master</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/addons/p5.sound.min.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
     canvas { display: block; }
@@ -24,7 +23,7 @@
     let player;
     let fuels = [];
     let obstacles = [];
-    let farts = []; // Flygande fisar i bakgrunden
+    let farts = [];
     let fuelCount = 0;
     let gameOver = false;
     let highScore = 0;
@@ -34,12 +33,6 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
-    let jumpSound, deathSound;
-
-    function preload() {
-      jumpSound = loadSound('https://www.myinstants.com/media/sounds/fart.mp3'); // Enkelt fisljud
-      deathSound = loadSound('https://www.myinstants.com/media/sounds/wet-fart.mp3'); // Våtare fisljud
-    }
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -56,7 +49,6 @@
       fill(100, 200, 100);
       rect(0, height - 100, width, 100);
 
-      // Rita bakgrundsfisar
       for (let fart of farts) {
         fart.show();
         fart.update();
@@ -130,7 +122,7 @@
           text("💨", player.x + 50, player.y - fartEffect * 5);
           pop();
           fartScore = Math.floor((60 - fartEffect) * fuelCount * 0.5);
-          if (fartScore < 0) fartScore = 0; // Förhindrar minus
+          if (fartScore < 0) fartScore = 0;
           fill(0);
           textSize(30);
           text(`Fart Score: ${fartScore}`, width / 2, height / 2 + 20);
@@ -157,7 +149,6 @@
       fartScene = true;
       fartEffect = map(fuelCount, 0, 50, 20, 60);
       fartScore = 0;
-      if (deathSound) deathSound.play();
     }
 
     function updateRank() {
@@ -180,7 +171,6 @@
           gameStarted = true;
         } else if (!gameOver) {
           player.jump();
-          if (jumpSound) jumpSound.play();
         }
       }
       if (key === 'r' && gameOver && !fartScene) resetGame();

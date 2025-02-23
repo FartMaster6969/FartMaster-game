@@ -78,8 +78,9 @@
 
         if (player.jumpFart > 0) {
           push();
+          textSize(20 + player.jumpFart * 2);
           fill(0, 255, 0, player.jumpFart * 20);
-          ellipse(player.x - 15, player.y + 40, player.jumpFart * 3, player.jumpFart * 2);
+          text("💨", player.x - 20, player.y + 40);
           pop();
           player.jumpFart--;
         }
@@ -376,8 +377,9 @@
       }
       show() {
         push();
+        textSize(this.size);
         fill(0, 255, 0, 50);
-        ellipse(this.x, this.y, this.size, this.size);
+        text("💨", this.x, this.y);
         pop();
       }
       update() {

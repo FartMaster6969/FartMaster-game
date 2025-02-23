@@ -62,14 +62,15 @@
         text("Press SPACE to start!", width / 2, height / 2 - 100);
         textSize(20);
         text("Fart Fuel Sources:", width / 2, height / 2 - 50);
-        text("🌮 Taco: 1-2 Fuel", width / 2, height / 2 - 20);
-        text("🥬 Cabbage: 3-4 Fuel", width / 2, height / 2 + 10);
-        text("🌶️ Chili: 5 Fuel", width / 2, height / 2 + 40);
-        text("Ranks:", width / 2, height / 2 + 80);
-        text("Fart Newbie: 0-1499", width / 2, height / 2 + 110);
-        text("Gas Pro: 1500-4999", width / 2, height / 2 + 140);
-        text("Fart Master: 5000-9999", width / 2, height / 2 + 170);
-        text("Super Fart Legend: 10000+", width / 2, height / 2 + 200);
+        text("🫘 Beans: 1 Fuel (Common)", width / 2, height / 2 - 20);
+        text("🌮 Taco: 3 Fuel", width / 2, height / 2 + 10);
+        text("🥚 Egg: 3 Fuel", width / 2, height / 2 + 40);
+        text("🍺 Beer: 10 Fuel (Rare)", width / 2, height / 2 + 70);
+        text("Ranks:", width / 2, height / 2 + 110);
+        text("Fart Newbie: 0-1499", width / 2, height / 2 + 140);
+        text("Gas Pro: 1500-4999", width / 2, height / 2 + 170);
+        text("Fart Master: 5000-9999", width / 2, height / 2 + 200);
+        text("Super Fart Legend: 10000+", width / 2, height / 2 + 230);
         player.show();
         player.updateStart();
       } else if (!gameOver) {
@@ -87,7 +88,14 @@
           player.jumpFart--;
         }
 
-        if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5)));
+        // Spawn av mat med ny frekvens
+        if (frameCount % 30 === 0) { // Oftare spawn (var 30:e frame)
+          let chance = random(1);
+          if (chance < 0.70) fuels.push(new Fuel(1, "🫘")); // 70% bönor
+          else if (chance < 0.85) fuels.push(new Fuel(3, "🌮")); // 15% tacos
+          else if (chance < 0.95) fuels.push(new Fuel(3, "🥚")); // 10% ägg
+          else fuels.push(new Fuel(10, "🍺")); // 5% öl
+        }
         if (frameCount % 100 === 0) {
           obstacles.push(new Obstacle(random(1) > 0.5));
         }
@@ -192,12 +200,12 @@
         this.velocity = 0;
         this.gravity = 0.7;
         this.width = 40;
-        this.height = 60; // Lite högre för detaljer
+        this.height = 60;
         this.jumpsLeft = 2;
         this.legAngle = 0;
         this.armAngle = 0;
         this.jumpFart = 0;
-        this.blinkTimer = random(60, 120); // Blinkar slumpmässigt
+        this.blinkTimer = random(60, 120);
       }
       show() {
         push();
@@ -207,10 +215,10 @@
         fill(150, 150, 150);
         rect(5, 20, 10, 20, 5);
         fill(255, 100, 0);
-        ellipse(10, 40, 10, 15); // Flamma
+        ellipse(10, 40, 10, 15);
         
         // Kropp
-        fill(0, 200, 0); // Grön dräkt
+        fill(0, 200, 0);
         rect(15, 20, 20, 30, 5);
         
         // Mantel
@@ -234,7 +242,7 @@
         // Ögon
         fill(255);
         ellipse(22, 13, 6, 6); ellipse(28, 13, 6, 6);
-        if (frameCount % this.blinkTimer > 5) { // Blinkar ibland
+        if (frameCount % this.blinkTimer > 5) {
           fill(0);
           ellipse(22, 13, 3, 3); ellipse(28, 13, 3, 3);
         }
@@ -278,7 +286,7 @@
         ellipse(10, 40, 8, 10);
         
         // Kropp
-        fill(0, 150, 0); // Bleknad grön
+        fill(0, 150, 0);
         rect(15, 20, 20, 30, 5);
         
         // Mantel (hängande)
@@ -357,10 +365,11 @@
     }
 
     class Fuel {
-      constructor(value) {
+      constructor(value, emoji) {
         this.x = width;
         this.y = random(height - 250, height - 140);
         this.value = value;
+        this.emoji = emoji;
         this.w = 25;
         this.h = 25;
       }
@@ -368,9 +377,7 @@
         push();
         textSize(25);
         fill(0);
-        if (this.value <= 2) text("🌮", this.x, this.y + 25);
-        else if (this.value <= 4) text("🥬", this.x, this.y + 25);
-        else text("🌶️", this.x, this.y + 25);
+        text(this.emoji, this.x, this.y + 25);
         pop();
       }
       update() {

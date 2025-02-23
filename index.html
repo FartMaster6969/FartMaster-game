@@ -69,8 +69,8 @@
         player.update();
 
         if (jumpFart > 0) {
-          fill(139, 69, 19, jumpFart * 20);
-          ellipse(player.x - 15, player.y + 40, jumpFart * 3, jumpFart * 2); // Gas-puff
+          fill(0, 255, 0, jumpFart * 20); // Grönt fismoln
+          ellipse(player.x - 15, player.y + 40, jumpFart * 3, jumpFart * 2);
           jumpFart--;
         }
 
@@ -108,7 +108,7 @@
         player.showDead();
         if (fartEffect > 0) {
           textSize(50 + fartEffect * 3);
-          fill(139, 69, 19, fartEffect * 3);
+          fill(0, 255, 0, fartEffect * 3); // Grön fis vid död
           text("💨", player.x + 50, player.y - fartEffect * 5);
           fartScore = Math.floor((60 - fartEffect) * fuelCount * 0.5);
           textSize(30);
@@ -178,37 +178,52 @@
         this.velocity = 0;
         this.gravity = 0.7;
         this.width = 40;
-        this.height = 50; // Lite högre för karaktären
+        this.height = 50;
+        this.jumpsLeft = 2;
+        this.legAngle = 0; // För spring-animation
       }
       show() {
         push();
         translate(this.x, this.y);
-        // Kropp
-        fill(255, 150, 0); // Orange dräkt
-        rect(10, 20, 20, 30, 5);
-        // Huvud
-        fill(255, 220, 200); // Hudfärg
-        ellipse(20, 15, 20, 20);
-        // Jetpack
-        fill(150);
-        rect(0, 20, 10, 20);
+        // Böna-kropp
+        fill(0, 200, 0); // Grön böna
+        ellipse(20, 25, 20, 40);
         // Ögon
+        fill(255);
+        ellipse(17, 15, 8, 8);
+        ellipse(23, 15, 8, 8);
         fill(0);
-        ellipse(17, 12, 4, 4);
-        ellipse(23, 12, 4, 4);
+        ellipse(17, 15, 4, 4);
+        ellipse(23, 15, 4, 4);
+        // Ben (springer)
+        stroke(0, 150, 0);
+        strokeWeight(4);
+        let leg1 = sin(this.legAngle) * 10;
+        let leg2 = -sin(this.legAngle) * 10;
+        line(15, 45, 15 + leg1, 60);
+        line(25, 45, 25 + leg2, 60);
+        noStroke();
         pop();
+        // Animera ben
+        if (this.velocity === 0) this.legAngle += 0.2; // Snabbare på marken
       }
       showDead() {
         push();
         translate(this.x, this.y);
-        // Död-version: bara skalle och bruten jetpack
+        // Död böna
+        fill(0, 150, 0); // Bleknad grön
+        ellipse(20, 25, 20, 40);
         fill(255);
-        ellipse(20, 15, 20, 20); // Skalle
+        ellipse(17, 15, 8, 8);
+        ellipse(23, 15, 8, 8);
         fill(0);
-        ellipse(17, 12, 6, 6);
-        ellipse(23, 12, 6, 6); // Tomma ögon
-        fill(150, 100);
-        rect(0, 20, 10, 20); // Trasig jetpack
+        ellipse(17, 15, 2, 2); // Små pupiller
+        ellipse(23, 15, 2, 2);
+        stroke(0, 100, 0);
+        strokeWeight(4);
+        line(15, 45, 15, 60); // Stilla ben
+        line(25, 45, 25, 60);
+        noStroke();
         pop();
       }
       update() {
@@ -230,7 +245,7 @@
         if (this.jumpsLeft > 0) {
           this.velocity = -12;
           this.jumpsLeft--;
-          jumpFart = 10; // Gas-puff vid hopp
+          jumpFart = 10; // Grönt fismoln vid hopp
         }
       }
       hits(obj) {

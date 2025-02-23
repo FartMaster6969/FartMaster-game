@@ -3,6 +3,7 @@
 <head>
   <title>Fart Master</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/addons/p5.sound.min.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
     canvas { display: block; }
@@ -33,6 +34,13 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
+    let jumpSound, deathSound;
+
+    function preload() {
+      // Ladda fisljud från gratis online-källor
+      jumpSound = loadSound('https://www.myinstants.com/media/sounds/fart.mp3'); // Kort fis för hopp
+      deathSound = loadSound('https://www.myinstants.com/media/sounds/wet-fart.mp3'); // Våt fis för död
+    }
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -160,15 +168,15 @@
       push();
       translate(x, y);
       fill(255, 215, 0); // Guld
-      ellipse(0, 0, 40, 40); // Större mynt (från 30 till 40)
+      ellipse(0, 0, 40, 40); // Större mynt
       fill(0, 255, 0); // Grön fis
-      textSize(20); // Större fis-emoji (från 16 till 20)
-      textAlign(CENTER, CENTER); // Centrerar texten
-      text("💨", 0, 0); // Perfekt centrerad i myntet
+      textSize(20);
+      textAlign(CENTER, CENTER);
+      text("💨", 0, 0); // Centrerad fis-emoji
       noFill();
       stroke(200, 150, 0); // Mörkare guldkant
       strokeWeight(2);
-      ellipse(0, 0, 42, 42); // Kant anpassad till större storlek
+      ellipse(0, 0, 42, 42); // Kant
       noStroke();
       pop();
     }
@@ -178,6 +186,7 @@
       fartScene = true;
       fartEffect = map(fuelCount, 0, 50, 20, 60);
       fartScore = 0;
+      if (deathSound) deathSound.play(); // Spela dödljud
     }
 
     function updateRank() {
@@ -229,17 +238,14 @@
         push();
         translate(this.x, this.y);
         
-        // Jetpack
         fill(150, 150, 150);
         rect(5, 20, 10, 20, 5);
         fill(255, 100, 0);
         ellipse(10, 40, 10, 15);
         
-        // Kropp
         fill(0, 200, 0);
         rect(15, 20, 20, 30, 5);
         
-        // Mantel
         fill(255, 0, 0);
         beginShape();
         vertex(15, 20);
@@ -248,16 +254,13 @@
         vertex(20 - sin(this.armAngle) * 5, 40);
         endShape(CLOSE);
         
-        // Huvud
         fill(255, 200, 150);
         ellipse(25, 15, 20, 20);
         
-        // Hjälm/krona
         fill(255, 215, 0);
         triangle(20, 10, 25, 5, 30, 10);
         ellipse(25, 10, 10, 5);
         
-        // Ögon
         fill(255);
         ellipse(22, 13, 6, 6); ellipse(28, 13, 6, 6);
         if (frameCount % this.blinkTimer > 5) {
@@ -265,21 +268,18 @@
           ellipse(22, 13, 3, 3); ellipse(28, 13, 3, 3);
         }
         
-        // Mun (flin)
         noFill();
         stroke(0);
         strokeWeight(2);
         arc(25, 18, 8, 4, 0, PI);
         noStroke();
         
-        // Armar
         stroke(0, 200, 0);
         strokeWeight(4);
         line(15, 25, 10 + sin(this.armAngle) * 5, 35);
         line(35, 25, 40 - sin(this.armAngle) * 5, 35);
         noStroke();
         
-        // Ben
         stroke(0, 200, 0);
         strokeWeight(4);
         line(20, 50, 20 + sin(this.legAngle) * 5, 60);
@@ -297,17 +297,14 @@
         push();
         translate(this.x, this.y);
         
-        // Jetpack (trasig)
         fill(100, 100, 100);
         rect(5, 20, 10, 20, 5);
         fill(150, 50, 0);
         ellipse(10, 40, 8, 10);
         
-        // Kropp
         fill(0, 150, 0);
         rect(15, 20, 20, 30, 5);
         
-        // Mantel (hängande)
         fill(200, 0, 0);
         beginShape();
         vertex(15, 20);
@@ -316,33 +313,27 @@
         vertex(20, 40);
         endShape(CLOSE);
         
-        // Huvud
         fill(200, 150, 100);
         ellipse(25, 15, 20, 20);
         
-        // Hjälm/krona (skadad)
         fill(200, 165, 0);
         triangle(20, 10, 25, 5, 30, 10);
         ellipse(25, 10, 10, 5);
         
-        // Ögon (stängda)
         stroke(0);
         strokeWeight(2);
         line(20, 13, 24, 13);
         line(26, 13, 30, 13);
         noStroke();
         
-        // Mun (ledsen)
         arc(25, 20, 8, 4, PI, TWO_PI);
         
-        // Armar (hängande)
         stroke(0, 150, 0);
         strokeWeight(4);
         line(15, 25, 10, 35);
         line(35, 25, 40, 35);
         noStroke();
         
-        // Ben (stilla)
         stroke(0, 150, 0);
         strokeWeight(4);
         line(20, 50, 20, 60);
@@ -371,6 +362,7 @@
           this.velocity = -12;
           this.jumpsLeft--;
           this.jumpFart = 10;
+          if (jumpSound) jumpSound.play(); // Spela hoppljud
         }
       }
       hits(obj) {

@@ -32,13 +32,10 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
-    let jumpFart = 0;
-    let menuState = "character"; // "character" eller "info"
-    let selectedCharacter = 0; // 0 = Gasbag, 1 = Turbo, 2 = Flamingo, 3 = Piraten
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
-      player = new Player(selectedCharacter);
+      player = new Player(getCharIdFromRank(highestRank));
       textAlign(CENTER);
       window.focus();
     }
@@ -49,48 +46,31 @@
       rect(0, height - 100, width, 100);
 
       if (!gameStarted) {
-        if (menuState === "character") {
-          // Karaktärsval-meny
-          textSize(40);
-          fill(0);
-          text("Choose Your Fart Master", width / 2, height / 2 - 200);
-          textSize(30);
-          fill(selectedCharacter === 0 ? [255, 0, 0] : [0]); text("Gasbag Gubbe", width / 2, height / 2 - 120);
-          fill(selectedCharacter === 1 ? [255, 0, 0] : [0]); text("Turbo Tarm", width / 2, height / 2 - 70);
-          fill(selectedCharacter === 2 ? [255, 0, 0] : [0]); text("Farting Flamingo", width / 2, height / 2 - 20);
-          fill(selectedCharacter === 3 ? [255, 0, 0] : [0]); text("Prutt-Piraten", width / 2, height / 2 + 30);
-          textSize(20);
-          fill(0);
-          text("Use ← → to select, ENTER to confirm", width / 2, height / 2 + 100);
-          player.showPreview(width / 2, height / 2 + 150);
-        } else if (menuState === "info") {
-          // Info-meny
-          textSize(40);
-          fill(0);
-          text("Fart Master", width / 2, height / 2 - 150);
-          textSize(30);
-          text("Press SPACE to start!", width / 2, height / 2 - 100);
-          textSize(20);
-          text("Fart Fuel Sources:", width / 2, height / 2 - 50);
-          text("🌮 Taco: 1-2 Fuel", width / 2, height / 2 - 20);
-          text("🥬 Cabbage: 3-4 Fuel", width / 2, height / 2 + 10);
-          text("🌶️ Chili: 5 Fuel", width / 2, height / 2 + 40);
-          text("Ranks:", width / 2, height / 2 + 80);
-          text("Fart Newbie: 0-1499", width / 2, height / 2 + 110);
-          text("Gas Pro: 1500-4999", width / 2, height / 2 + 140);
-          text("Fart Master: 5000-9999", width / 2, height / 2 + 170);
-          text("Super Fart Legend: 10000+", width / 2, height / 2 + 200);
-          player.show();
-          player.updateStart();
-        }
+        textSize(40);
+        fill(0);
+        text("Fart Master", width / 2, height / 2 - 150);
+        textSize(30);
+        text("Press SPACE to start!", width / 2, height / 2 - 100);
+        textSize(20);
+        text("Fart Fuel Sources:", width / 2, height / 2 - 50);
+        text("🌮 Taco: 1-2 Fuel", width / 2, height / 2 - 20);
+        text("🥬 Cabbage: 3-4 Fuel", width / 2, height / 2 + 10);
+        text("🌶️ Chili: 5 Fuel", width / 2, height / 2 + 40);
+        text("Ranks:", width / 2, height / 2 + 80);
+        text("Fart Newbie: 0-1499", width / 2, height / 2 + 110);
+        text("Gas Pro: 1500-4999", width / 2, height / 2 + 140);
+        text("Fart Master: 5000-9999", width / 2, height / 2 + 170);
+        text("Super Fart Legend: 10000+", width / 2, height / 2 + 200);
+        player.show();
+        player.updateStart();
       } else if (!gameOver) {
         player.show();
         player.update();
 
-        if (jumpFart > 0) {
-          fill(0, 255, 0, jumpFart * 20);
-          ellipse(player.x - 15, player.y + 40, jumpFart * 3, jumpFart * 2);
-          jumpFart--;
+        if (player.jumpFart > 0) {
+          fill(0, 255, 0, player.jumpFart * 20);
+          ellipse(player.x - 15, player.y + 40, player.jumpFart * 3, player.jumpFart * 2);
+          player.jumpFart--;
         }
 
         if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5)));
@@ -165,17 +145,16 @@
       else if (highestRank == "Fart Newbie") highestRank = "Fart Newbie";
     }
 
+    function getCharIdFromRank(rank) {
+      if (rank === "Super Fart Legend") return 3; // Prutt-Piraten
+      if (rank === "Fart Master") return 2; // Farting Flamingo
+      if (rank === "Gas Pro") return 1; // Turbo Tarm
+      return 0; // Gasbag Gubbe
+    }
+
     function keyPressed() {
-      if (!gameStarted && menuState === "character") {
-        if (keyCode === LEFT_ARROW) selectedCharacter = max(0, selectedCharacter - 1);
-        if (keyCode === RIGHT_ARROW) selectedCharacter = min(3, selectedCharacter + 1);
-        if (keyCode === ENTER) {
-          menuState = "info";
-          player = new Player(selectedCharacter);
-        }
-      }
       if (key === ' ' || keyCode === 32) {
-        if (!gameStarted && menuState === "info") {
+        if (!gameStarted) {
           gameStarted = true;
         } else if (!gameOver) {
           player.jump();
@@ -190,12 +169,10 @@
       fuelCount = 0;
       fuels = [];
       obstacles = [];
-      player = new Player(selectedCharacter);
+      player = new Player(getCharIdFromRank(highestRank));
       fartScene = false;
       fartEffect = 0;
       fartScore = 0;
-      jumpFart = 0;
-      menuState = "character";
       document.getElementById("restartButton").style.display = "none";
     }
 
@@ -208,103 +185,98 @@
         this.width = 40;
         this.height = 50;
         this.jumpsLeft = 2;
-        this.charId = charId; // 0-3 för karaktärerna
-        this.legAngle = 0; // För animation
+        this.charId = charId;
+        this.legAngle = 0;
+        this.jumpFart = 0; // Flyttat hit från global
       }
       show() {
         push();
         translate(this.x, this.y);
         if (this.charId === 0) { // Gasbag Gubbe
-          fill(255, 200, 150); // Hudfärg
-          ellipse(20, 25, 30, 40); // Uppblåst kropp
+          fill(255, 200, 150);
+          ellipse(20, 25, 30, 40);
           fill(255);
-          ellipse(15, 15, 8, 8); ellipse(25, 15, 8, 8); // Ögon
+          ellipse(15, 15, 8, 8); ellipse(25, 15, 8, 8);
           fill(0);
           ellipse(15, 15, 4, 4); ellipse(25, 15, 4, 4);
         } else if (this.charId === 1) { // Turbo Tarm
           noFill();
-          stroke(255, 150, 150); // Rosa tarm
+          stroke(255, 150, 150);
           strokeWeight(10);
           beginShape();
           for (let i = 0; i < 5; i++) curveVertex(20 + sin(i * 0.5 + this.legAngle) * 10, 10 + i * 10);
           endShape();
           noStroke();
           fill(0);
-          ellipse(15, 10, 4, 4); ellipse(25, 10, 4, 4); // Ögon
+          ellipse(15, 10, 4, 4); ellipse(25, 10, 4, 4);
           this.legAngle += 0.1;
         } else if (this.charId === 2) { // Farting Flamingo
-          fill(255, 150, 200); // Rosa
-          ellipse(20, 25, 20, 40); // Kropp
-          line(20, 5, 30, 15); // Näbb
+          fill(255, 150, 200);
+          ellipse(20, 25, 20, 40);
+          line(20, 5, 30, 15);
           stroke(255, 100, 150);
           strokeWeight(4);
-          line(20, 45, 20 + sin(this.legAngle) * 10, 60); // Ett ben
+          line(20, 45, 20 + sin(this.legAngle) * 10, 60);
           noStroke();
           fill(0);
-          ellipse(15, 15, 4, 4); // Öga
+          ellipse(15, 15, 4, 4);
           this.legAngle += 0.2;
         } else if (this.charId === 3) { // Prutt-Piraten
-          fill(150, 100, 50); // Brun jacka
+          fill(150, 100, 50);
           rect(10, 20, 20, 30, 5);
-          fill(255, 200, 150); // Ansikte
+          fill(255, 200, 150);
           ellipse(20, 15, 20, 20);
           fill(0);
-          ellipse(25, 12, 6, 6); // Öga
-          rect(15, 10, 10, 5); // Ögonlapp
+          ellipse(25, 12, 6, 6);
+          rect(15, 10, 10, 5);
           stroke(100);
           strokeWeight(4);
-          line(10, 50, 5, 60); // Träben
+          line(10, 50, 5, 60);
           noStroke();
         }
-        pop();
-      }
-      showPreview(px, py) {
-        push();
-        translate(px - 20, py - 25);
-        this.show();
         pop();
       }
       showDead() {
         push();
         translate(this.x, this.y);
-        if (this.charId === 0) { // Gasbag Gubbe
-          fill(200, 150, 100); // Bleknad
+        if (this.charId === 0) {
+          fill(200, 150, 100);
           ellipse(20, 25, 30, 40);
           fill(255);
           ellipse(15, 15, 8, 8); ellipse(25, 15, 8, 8);
           fill(0);
           ellipse(15, 15, 2, 2); ellipse(25, 15, 2, 2);
-        } else if (this.charId === 1) { // Turbo Tarm
+        } else if (this.charId === 1) {
           noFill();
-          stroke(200, 100, 100); // Bleknad
+          stroke(200, 100, 100);
           strokeWeight(10);
           beginShape();
-          for (let i = 0; i < 5; i++) curveVertex(20, 10 + i * 10); // Raknat
+          for (let i = 0; i < 5; i++) curveVertex(20, 10 + i * 10);
           endShape();
           noStroke();
           fill(0);
           ellipse(15, 10, 2, 2); ellipse(25, 10, 2, 2);
-        } else if (this.charId === 2) { // Farting Flamingo
-          fill(200, 100, 150); // Bleknad
+        } else if (this.charId === 2) {
+          fill(200, 100, 150);
           ellipse(20, 25, 20, 40);
           line(20, 5, 30, 15);
           stroke(200, 80, 120);
           strokeWeight(4);
-          line(20, 45, 15, 60); line(20, 45, 25, 60); // Båda benen
+          line(20, 45, 15, 60); line(20, 45, 25, 60);
           noStroke();
           fill(0);
           ellipse(15, 15, 2, 2);
-        } else if (this.charId === 3) { // Prutt-Piraten
-          fill(100, 70, 30); // Trasig jacka
+        } else if (this.charId === 3) {
+          fill(100, 70, 30);
           rect(10, 20, 20, 30, 5);
-          fill(200, 150, 100); // Blekt ansikte
+          fill(200, 150, 100);
           ellipse(20, 15, 20, 20);
           fill(0);
           ellipse(25, 12, 4, 4);
           rect(15, 10, 10, 5);
           stroke(80);
           strokeWeight(4);
-          line(10, 50, 5, 60); // Brutet träben
+          line(10, 50, 5, 60);
           noStroke();
         }
         pop();
@@ -328,7 +300,7 @@
         if (this.jumpsLeft > 0) {
           this.velocity = -12;
           this.jumpsLeft--;
-          jumpFart = 10;
+          this.jumpFart = 10;
         }
       }
       hits(obj) {

@@ -31,6 +31,18 @@
             left: 50px;
             transition: top 0.2s;
         }
+        .fartCloud {
+            position: absolute;
+            font-size: 30px;
+            bottom: -20px;
+            left: 15px;
+            opacity: 0;
+            animation: floatUp 1s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; bottom: -20px; }
+            100% { opacity: 0; bottom: 20px; }
+        }
         .obstacle {
             position: absolute;
             width: 50px;
@@ -42,13 +54,27 @@
             font-size: 30px;
             color: #fff;
         }
-        #score {
+        #score, #message {
             font-size: 24px;
             margin: 10px;
         }
         #tokenInfo {
             font-size: 20px;
             margin: 10px;
+        }
+        #restartButton {
+            display: none;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #restartButton:hover {
+            background-color: #cc5200;
         }
         a { color: #00cc00; }
     </style>
@@ -59,14 +85,18 @@
     <div id="gameArea">
         <div id="character">👨‍🦳</div>
     </div>
+    <p id="message"></p>
     <p id="tokenInfo">FartMaster Coin (FMC) Address: <span id="tokenAddress">[Launching soon]</span></p>
     <p><a href="https://twitter.com/FartMasterCoin">Följ oss på Twitter för updates!</a></p>
+    <button id="restartButton" onclick="restartGame()">Restart</button>
 
     <script>
         const gameArea = document.getElementById("gameArea");
         const character = document.getElementById("character");
         const scoreDisplay = document.getElementById("score");
+        const messageDisplay = document.getElementById("message");
         const tokenAddress = document.getElementById("tokenAddress");
+        const restartButton = document.getElementById("restartButton");
 
         let score = 0;
         let characterY = 300; // Startposition i mitten (px)
@@ -76,7 +106,7 @@
         let obstacleSpeed = 3;
         let obstacleInterval;
 
-        // Placera karaktären
+        // Placera karaktären och hantera hopp
         function updateCharacter() {
             if (!isGameOver) {
                 characterY += gravity;
@@ -86,13 +116,30 @@
             }
         }
 
-        // Hantera hopp (fis)
-        document.addEventListener("click", () => {
+        // Hoppa med mus eller mellanslag
+        document.addEventListener("click", jump);
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && !isGameOver) {
+                jump();
+            }
+        });
+
+        function jump() {
             if (!isGameOver) {
                 characterY += jumpHeight;
                 if (characterY < 0) characterY = 0; // Förhindra att gå över toppen
+                showFartCloud(); // Visa gasmoln vid hopp
             }
-        });
+        }
+
+        // Visa gasmoln vid hopp
+        function showFartCloud() {
+            const cloud = document.createElement("div");
+            cloud.className = "fartCloud";
+            cloud.innerText = "💨";
+            character.appendChild(cloud);
+            setTimeout(() => cloud.remove(), 1000); // Ta bort efter 1 sekund
+        }
 
         // Skapa hinder
         function createObstacle() {
@@ -138,9 +185,21 @@
         function gameOver() {
             isGameOver = true;
             clearInterval(obstacleInterval);
-            messageDisplay.innerText = "Game Over! Try again by refreshing the page.";
-            // Lägg till messageDisplay om du vill ha ett meddelande
-            alert("Game Over! You collected " + score + " FMC. Refresh to try again!");
+            messageDisplay.innerText = "Game Over! You collected " + score + " FMC.";
+            restartButton.style.display = "block"; // Visa restart-knappen
+        }
+
+        // Restart spelet
+        function restartGame() {
+            score = 0;
+            characterY = 300;
+            isGameOver = false;
+            scoreDisplay.innerText = "FMC: 0";
+            messageDisplay.innerText = "";
+            restartButton.style.display = "none"; // Dölj restart-knappen
+            gameArea.innerHTML = '<div id="character">👨‍🦳</div>'; // Återställ karaktär
+            character = document.getElementById("character");
+            startGame();
         }
 
         // Lägg till token-adress efter lansering

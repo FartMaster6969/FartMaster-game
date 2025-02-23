@@ -24,8 +24,8 @@
     let fuels = [];
     let obstacles = [];
     let farts = [];
-    let clouds = []; // Nya moln
-    let powerUps = []; // Nya power-ups
+    let clouds = [];
+    let powerUps = [];
     let fuelCount = 0;
     let gameOver = false;
     let highScore = 0;
@@ -35,8 +35,8 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
-    let coinAngle = 0; // För att animera FartMasterCoin
-    let twitterIconX, twitterIconY; // För Twitter-ikonens position
+    let coinAngle = 0;
+    let twitterIconX, twitterIconY;
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -49,12 +49,11 @@
       for (let i = 0; i < 5; i++) {
         clouds.push(new Cloud());
       }
-      twitterIconX = width - 50; // Twitter-ikon uppe till höger
-      twitterIconY = 20;
+      twitterIconX = width - 50; // Nere till höger
+      twitterIconY = height - 30;
     }
 
     function draw() {
-      // Gradient-bakgrund
       for (let i = 0; i < height; i++) {
         let inter = map(i, 0, height, 0, 1);
         let c = lerpColor(color(150, 200, 255), color(50, 100, 200), inter);
@@ -117,7 +116,7 @@
           else fuels.push(new Fuel(10, "🍺"));
         }
         if (frameCount % 200 === 0) {
-          powerUps.push(new PowerUp()); // Power-up spawnar mer sällan
+          powerUps.push(new PowerUp());
         }
         if (frameCount % 100 === 0) {
           obstacles.push(new Obstacle(random(1) > 0.5));
@@ -137,7 +136,7 @@
           powerUps[i].show();
           powerUps[i].update();
           if (player.hits(powerUps[i])) {
-            player.boostTimer = 180; // 3 sekunder boost (60 fps * 3)
+            player.boostTimer = 180;
             powerUps.splice(i, 1);
           }
           if (powerUps[i].x < -20) powerUps.splice(i, 1);
@@ -158,7 +157,7 @@
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
         drawCoin(width / 2, 65);
-        drawTwitterIcon(twitterIconX, twitterIconY); // Twitter-ikon
+        drawTwitterIcon(twitterIconX, twitterIconY);
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -193,7 +192,7 @@
     function drawCoin(x, y) {
       push();
       translate(x, y);
-      rotate(coinAngle); // Snurrar myntet
+      rotate(coinAngle);
       fill(255, 215, 0);
       ellipse(0, 0, 40, 40);
       fill(0, 255, 0);
@@ -206,26 +205,25 @@
       ellipse(0, 0, 42, 42);
       noStroke();
       pop();
-      coinAngle += 0.05; // Snurrhastighet
+      coinAngle += 0.05;
     }
 
     function drawTwitterIcon(x, y) {
       push();
       translate(x, y);
-      fill(29, 161, 242); // Twitter-blå
+      fill(29, 161, 242);
       ellipse(0, 0, 30, 30);
       fill(255);
       textSize(18);
       textAlign(CENTER, CENTER);
-      text("🐦", 0, 2); // Twitter-fågel (enkel emoji)
+      text("🐦", 0, 2);
       pop();
     }
 
     function mousePressed() {
-      // Kolla om klick är på Twitter-ikonen
       let d = dist(mouseX, mouseY, twitterIconX, twitterIconY);
-      if (d < 15) { // Radien på ikonen är 15
-        window.open("https://twitter.com/DITT_TWITTER_ANVÄNDARNAMN", "_blank"); // Byt till ditt konto
+      if (d < 15) {
+        window.open("https://x.com/FartMasterGame", "_blank"); // Din Twitter-länk
       }
     }
 
@@ -281,20 +279,19 @@
         this.armAngle = 0;
         this.jumpFart = 0;
         this.blinkTimer = random(60, 120);
-        this.boostTimer = 0; // Timer för Gas Boost
+        this.boostTimer = 0;
       }
       show() {
         push();
         translate(this.x, this.y);
         
-        // Jetpack med gas-effekt om boost är aktiv
         fill(150, 150, 150);
         rect(5, 20, 10, 20, 5);
         fill(255, 100, 0);
-        ellipse(10, 40, 10, this.boostTimer > 0 ? 20 : 15); // Större flamma vid boost
+        ellipse(10, 40, 10, this.boostTimer > 0 ? 20 : 15);
         if (this.boostTimer > 0) {
           fill(0, 255, 0, 100);
-          ellipse(10, 45, 15, 10); // Extra gas-effekt
+          ellipse(10, 45, 15, 10);
         }
         
         fill(0, 200, 0);
@@ -311,8 +308,7 @@
         fill(255, 200, 150);
         ellipse(25, 15, 20, 20);
         
-        // Blinkande krona
-        fill(this.boostTimer > 0 || frameCount % 20 < 10 ? 255 : 200, 215, 0); // Blinkar eller lyser vid boost
+        fill(this.boostTimer > 0 || frameCount % 20 < 10 ? 255 : 200, 215, 0);
         triangle(20, 10, 25, 5, 30, 10);
         ellipse(25, 10, 10, 5);
         
@@ -395,10 +391,10 @@
           this.velocity = 0;
           this.jumpsLeft = 2;
         }
-        if (keyIsDown(LEFT_ARROW)) this.x -= this.boostTimer > 0 ? 9 : 6; // Snabbare med boost
+        if (keyIsDown(LEFT_ARROW)) this.x -= this.boostTimer > 0 ? 9 : 6;
         if (keyIsDown(RIGHT_ARROW)) this.x += this.boostTimer > 0 ? 9 : 6;
         this.x = constrain(this.x, 0, width - this.width);
-        if (this.boostTimer > 0) this.boostTimer--; // Minskar boost-tiden
+        if (this.boostTimer > 0) this.boostTimer--;
       }
       updateStart() {
         this.y = height - 140;
@@ -531,7 +527,8 @@
 
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
-      twitterIconX = width - 50; // Justera ikonens position vid resize
+      twitterIconX = width - 50;
+      twitterIconY = height - 30;
     }
   </script>
 </body>

@@ -36,7 +36,7 @@
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
-      player = new Player(getCharIdFromRank(highestRank));
+      player = new Player();
       textAlign(CENTER);
       window.focus();
       for (let i = 0; i < 10; i++) {
@@ -161,13 +161,6 @@
       else if (highestRank == "Fart Newbie") highestRank = "Fart Newbie";
     }
 
-    function getCharIdFromRank(rank) {
-      if (rank === "Super Fart Legend") return 3;
-      if (rank === "Fart Master") return 2;
-      if (rank === "Gas Pro") return 1;
-      return 0;
-    }
-
     function keyPressed() {
       if (key === ' ' || keyCode === 32) {
         if (!gameStarted) {
@@ -185,7 +178,7 @@
       fuelCount = 0;
       fuels = [];
       obstacles = [];
-      player = new Player(getCharIdFromRank(highestRank));
+      player = new Player();
       fartScene = false;
       fartEffect = 0;
       fartScore = 0;
@@ -193,186 +186,143 @@
     }
 
     class Player {
-      constructor(charId) {
+      constructor() {
         this.x = 100;
         this.y = height - 140;
         this.velocity = 0;
         this.gravity = 0.7;
         this.width = 40;
-        this.height = 50;
+        this.height = 60; // Lite högre för detaljer
         this.jumpsLeft = 2;
-        this.charId = charId;
         this.legAngle = 0;
         this.armAngle = 0;
         this.jumpFart = 0;
+        this.blinkTimer = random(60, 120); // Blinkar slumpmässigt
       }
       show() {
         push();
         translate(this.x, this.y);
-        if (this.charId === 0) { // Gasbag Gubbe
-          // Kropp
-          fill(255, 200, 150);
-          ellipse(20, 30, 30, 40);
-          // Huvud
-          ellipse(20, 10, 20, 20);
-          // Ögon
-          fill(255);
-          ellipse(15, 8, 6, 6); ellipse(25, 8, 6, 6);
+        
+        // Jetpack
+        fill(150, 150, 150);
+        rect(5, 20, 10, 20, 5);
+        fill(255, 100, 0);
+        ellipse(10, 40, 10, 15); // Flamma
+        
+        // Kropp
+        fill(0, 200, 0); // Grön dräkt
+        rect(15, 20, 20, 30, 5);
+        
+        // Mantel
+        fill(255, 0, 0);
+        beginShape();
+        vertex(15, 20);
+        vertex(35, 20);
+        vertex(30 + sin(this.armAngle) * 5, 40);
+        vertex(20 - sin(this.armAngle) * 5, 40);
+        endShape(CLOSE);
+        
+        // Huvud
+        fill(255, 200, 150);
+        ellipse(25, 15, 20, 20);
+        
+        // Hjälm/krona
+        fill(255, 215, 0);
+        triangle(20, 10, 25, 5, 30, 10);
+        ellipse(25, 10, 10, 5);
+        
+        // Ögon
+        fill(255);
+        ellipse(22, 13, 6, 6); ellipse(28, 13, 6, 6);
+        if (frameCount % this.blinkTimer > 5) { // Blinkar ibland
           fill(0);
-          ellipse(15, 8, 3, 3); ellipse(25, 8, 3, 3);
-          // Armar
-          stroke(255, 200, 150);
-          strokeWeight(4);
-          line(10, 25, 5 + sin(this.armAngle) * 5, 35);
-          line(30, 25, 35 - sin(this.armAngle) * 5, 35);
-          noStroke();
-          // Ben
-          stroke(255, 200, 150);
-          strokeWeight(4);
-          line(15, 50, 15 + sin(this.legAngle) * 5, 60);
-          line(25, 50, 25 - sin(this.legAngle) * 5, 60);
-          noStroke();
-        } else if (this.charId === 1) { // Turbo Tarm
-          // Kropp (slingrig tarm)
-          noFill();
-          stroke(255, 150, 150);
-          strokeWeight(10);
-          beginShape();
-          for (let i = 0; i < 6; i++) curveVertex(20 + sin(i * 0.5 + this.legAngle) * 10, 5 + i * 10);
-          endShape();
-          noStroke();
-          // Ögon längst upp
-          fill(255);
-          ellipse(15, 5, 6, 6); ellipse(25, 5, 6, 6);
-          fill(0);
-          ellipse(15, 5, 3, 3); ellipse(25, 5, 3, 3);
-          // Små "fötter"
-          fill(255, 150, 150);
-          ellipse(15 + sin(this.legAngle) * 5, 55, 8, 8);
-          ellipse(25 - sin(this.legAngle) * 5, 55, 8, 8);
-        } else if (this.charId === 2) { // Farting Flamingo
-          // Kropp
-          fill(255, 150, 200);
-          ellipse(20, 30, 20, 40);
-          // Huvud och näbb
-          ellipse(20, 10, 15, 15);
-          stroke(255, 100, 150);
-          strokeWeight(3);
-          line(20, 10, 30, 15);
-          noStroke();
-          // Öga
-          fill(0);
-          ellipse(17, 8, 4, 4);
-          // Vinge
-          fill(255, 150, 200);
-          ellipse(10, 30, 15, 25 + sin(this.armAngle) * 5);
-          // Ben
-          stroke(255, 100, 150);
-          strokeWeight(4);
-          line(20, 50, 20 + sin(this.legAngle) * 10, 65);
-          noStroke();
+          ellipse(22, 13, 3, 3); ellipse(28, 13, 3, 3);
+        }
+        
+        // Mun (flin)
+        noFill();
+        stroke(0);
+        strokeWeight(2);
+        arc(25, 18, 8, 4, 0, PI);
+        noStroke();
+        
+        // Armar
+        stroke(0, 200, 0);
+        strokeWeight(4);
+        line(15, 25, 10 + sin(this.armAngle) * 5, 35);
+        line(35, 25, 40 - sin(this.armAngle) * 5, 35);
+        noStroke();
+        
+        // Ben
+        stroke(0, 200, 0);
+        strokeWeight(4);
+        line(20, 50, 20 + sin(this.legAngle) * 5, 60);
+        line(30, 50, 30 - sin(this.legAngle) * 5, 60);
+        noStroke();
+        
+        pop();
+        if (this.velocity === 0) {
           this.legAngle += 0.2;
           this.armAngle += 0.1;
-        } else if (this.charId === 3) { // Prutt-Piraten
-          // Kropp
-          fill(150, 100, 50);
-          rect(10, 20, 20, 30, 5);
-          // Huvud
-          fill(255, 200, 150);
-          ellipse(20, 10, 20, 20);
-          // Ögon och ögonlapp
-          fill(0);
-          ellipse(25, 8, 6, 6);
-          rect(15, 6, 10, 6);
-          // Hatt
-          fill(0);
-          triangle(10, 5, 20, 0, 30, 5);
-          // Armar
-          stroke(150, 100, 50);
-          strokeWeight(4);
-          line(10, 25, 5 + sin(this.armAngle) * 5, 35);
-          line(30, 25, 35 - sin(this.armAngle) * 5, 35);
-          noStroke();
-          // Ben
-          stroke(100);
-          strokeWeight(4);
-          line(15, 50, 15, 60); // Träben
-          stroke(150, 100, 50);
-          line(25, 50, 25 + sin(this.legAngle) * 5, 60);
-          noStroke();
-          this.armAngle += 0.1;
         }
-        pop();
-        if (this.velocity === 0) this.legAngle += 0.2; // Snabbare på marken
+        if (frameCount % this.blinkTimer === 0) this.blinkTimer = random(60, 120);
       }
       showDead() {
         push();
         translate(this.x, this.y);
-        if (this.charId === 0) {
-          fill(200, 150, 100);
-          ellipse(20, 30, 30, 40);
-          ellipse(20, 10, 20, 20);
-          fill(255);
-          ellipse(15, 8, 6, 6); ellipse(25, 8, 6, 6);
-          fill(0);
-          ellipse(15, 8, 2, 2); ellipse(25, 8, 2, 2);
-          stroke(200, 150, 100);
-          strokeWeight(4);
-          line(15, 50, 15, 60);
-          line(25, 50, 25, 60);
-          noStroke();
-        } else if (this.charId === 1) {
-          noFill();
-          stroke(200, 100, 100);
-          strokeWeight(10);
-          beginShape();
-          for (let i = 0; i < 6; i++) curveVertex(20, 5 + i * 10);
-          endShape();
-          noStroke();
-          fill(255);
-          ellipse(15, 5, 6, 6); ellipse(25, 5, 6, 6);
-          fill(0);
-          ellipse(15, 5, 2, 2); ellipse(25, 5, 2, 2);
-          fill(200, 100, 100);
-          ellipse(15, 55, 8, 8); ellipse(25, 55, 8, 8);
-        } else if (this.charId === 2) {
-          fill(200, 100, 150);
-          ellipse(20, 30, 20, 40);
-          ellipse(20, 10, 15, 15);
-          stroke(200, 80, 120);
-          strokeWeight(3);
-          line(20, 10, 30, 15);
-          noStroke();
-          fill(0);
-          ellipse(17, 8, 2, 2);
-          fill(200, 100, 150);
-          ellipse(10, 30, 15, 25);
-          stroke(200, 80, 120);
-          strokeWeight(4);
-          line(20, 50, 15, 65); line(20, 50, 25, 65);
-          noStroke();
-        } else if (this.charId === 3) {
-          fill(100, 70, 30);
-          rect(10, 20, 20, 30, 5);
-          fill(200, 150, 100);
-          ellipse(20, 10, 20, 20);
-          fill(0);
-          ellipse(25, 8, 4, 4);
-          rect(15, 6, 10, 6);
-          fill(50);
-          triangle(10, 5, 20, 0, 30, 5);
-          stroke(100, 70, 30);
-          strokeWeight(4);
-          line(10, 25, 5, 35);
-          line(30, 25, 35, 35);
-          noStroke();
-          stroke(80);
-          strokeWeight(4);
-          line(15, 50, 15, 60);
-          stroke(100, 70, 30);
-          line(25, 50, 25, 60);
-          noStroke();
-        }
+        
+        // Jetpack (trasig)
+        fill(100, 100, 100);
+        rect(5, 20, 10, 20, 5);
+        fill(150, 50, 0);
+        ellipse(10, 40, 8, 10);
+        
+        // Kropp
+        fill(0, 150, 0); // Bleknad grön
+        rect(15, 20, 20, 30, 5);
+        
+        // Mantel (hängande)
+        fill(200, 0, 0);
+        beginShape();
+        vertex(15, 20);
+        vertex(35, 20);
+        vertex(30, 40);
+        vertex(20, 40);
+        endShape(CLOSE);
+        
+        // Huvud
+        fill(200, 150, 100);
+        ellipse(25, 15, 20, 20);
+        
+        // Hjälm/krona (skadad)
+        fill(200, 165, 0);
+        triangle(20, 10, 25, 5, 30, 10);
+        ellipse(25, 10, 10, 5);
+        
+        // Ögon (stängda)
+        stroke(0);
+        strokeWeight(2);
+        line(20, 13, 24, 13);
+        line(26, 13, 30, 13);
+        noStroke();
+        
+        // Mun (ledsen)
+        arc(25, 20, 8, 4, PI, TWO_PI);
+        
+        // Armar (hängande)
+        stroke(0, 150, 0);
+        strokeWeight(4);
+        line(15, 25, 10, 35);
+        line(35, 25, 40, 35);
+        noStroke();
+        
+        // Ben (stilla)
+        stroke(0, 150, 0);
+        strokeWeight(4);
+        line(20, 50, 20, 60);
+        line(30, 50, 30, 60);
+        noStroke();
+        
         pop();
       }
       update() {

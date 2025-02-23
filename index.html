@@ -32,6 +32,7 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
+    let jumpFart = 0;
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -46,7 +47,6 @@
       rect(0, height - 100, width, 100);
 
       if (!gameStarted) {
-        // Meny/Startskärm
         textSize(40);
         fill(0);
         text("Fart Master", width / 2, height / 2 - 150);
@@ -67,6 +67,12 @@
       } else if (!gameOver) {
         player.show();
         player.update();
+
+        if (jumpFart > 0) {
+          fill(139, 69, 19, jumpFart * 20);
+          ellipse(player.x - 15, player.y + 40, jumpFart * 3, jumpFart * 2); // Gas-puff
+          jumpFart--;
+        }
 
         if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5)));
         if (frameCount % 100 === 0) {
@@ -161,6 +167,7 @@
       fartScene = false;
       fartEffect = 0;
       fartScore = 0;
+      jumpFart = 0;
       document.getElementById("restartButton").style.display = "none";
     }
 
@@ -171,16 +178,38 @@
         this.velocity = 0;
         this.gravity = 0.7;
         this.width = 40;
-        this.height = 40;
-        this.jumpsLeft = 2;
+        this.height = 50; // Lite högre för karaktären
       }
       show() {
-        textSize(40);
-        text("🏃", this.x, this.y + 40);
+        push();
+        translate(this.x, this.y);
+        // Kropp
+        fill(255, 150, 0); // Orange dräkt
+        rect(10, 20, 20, 30, 5);
+        // Huvud
+        fill(255, 220, 200); // Hudfärg
+        ellipse(20, 15, 20, 20);
+        // Jetpack
+        fill(150);
+        rect(0, 20, 10, 20);
+        // Ögon
+        fill(0);
+        ellipse(17, 12, 4, 4);
+        ellipse(23, 12, 4, 4);
+        pop();
       }
       showDead() {
-        textSize(40);
-        text("💀", this.x, this.y + 40);
+        push();
+        translate(this.x, this.y);
+        // Död-version: bara skalle och bruten jetpack
+        fill(255);
+        ellipse(20, 15, 20, 20); // Skalle
+        fill(0);
+        ellipse(17, 12, 6, 6);
+        ellipse(23, 12, 6, 6); // Tomma ögon
+        fill(150, 100);
+        rect(0, 20, 10, 20); // Trasig jetpack
+        pop();
       }
       update() {
         this.velocity += this.gravity;
@@ -201,6 +230,7 @@
         if (this.jumpsLeft > 0) {
           this.velocity = -12;
           this.jumpsLeft--;
+          jumpFart = 10; // Gas-puff vid hopp
         }
       }
       hits(obj) {

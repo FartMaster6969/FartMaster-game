@@ -30,7 +30,7 @@
     let fartScene = false;
     let fartEffect = 0;
     let fartScore = 0;
-    let rank = "Pruttlärling"; // Start-rank
+    let rank = "Pruttlärling";
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -91,7 +91,7 @@
           textSize(50 + fartEffect * 5);
           fill(139, 69, 19, fartEffect * 5);
           text("💨", player.x + 50, player.y - fartEffect * 5);
-          fartScore = Math.floor(fartEffect * fuelCount * 0.5); // Poäng räknas upp
+          fartScore = Math.floor(fartEffect * fuelCount * 0.5);
           textSize(30);
           fill(0);
           text(`Fart Score: ${fartScore}`, width / 2, height / 2 + 20);
@@ -103,7 +103,7 @@
           }
         }
       } else {
-        // Resultat efter fis-scen
+        // Resultat
         textSize(50);
         fill(255, 0, 0);
         text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
@@ -117,13 +117,14 @@
     function endGame() {
       gameOver = true;
       fartScene = true;
-      fartEffect = map(fuelCount, 0, 50, 20, 60); // Längre fis-animation
+      fartEffect = map(fuelCount, 0, 50, 20, 60); // Längre fis oavsett fuel
+      if (fuelCount === 0) fartScore = 0; // Noll poäng om ingen fuel
     }
 
     function updateRank() {
-      if (fartScore >= 1000) rank = "Superfartmästare";
-      else if (fartScore >= 500) rank = "Fartmästare";
-      else if (fartScore >= 200) rank = "Gasexpert";
+      if (fartScore >= 5000) rank = "Superfartmästare"; // Mycket svårare
+      else if (fartScore >= 2000) rank = "Fartmästare";
+      else if (fartScore >= 750) rank = "Gasexpert";
       else rank = "Pruttlärling";
     }
 

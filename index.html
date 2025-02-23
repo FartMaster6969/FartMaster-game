@@ -1,409 +1,125 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fart Frenzy: Cosmic Stink (Test)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-        }
-        #gameArea {
-            position: relative;
-            width: 800px;
-            height: 600px;
-            background: #000000; /* Svart rymd-bakgrund */
-            margin: 20px auto;
-            border: 2px solid #fff;
-            overflow: hidden;
-        }
-        #backgroundStars {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#000000"/><text x="10" y="20" fill="white">★</text><text x="50" y="50" fill="white">★</text><text x="100" y="80" fill="white">★</text><text x="150" y="120" fill="white">★</text></svg>') no-repeat;
-            animation: scrollStars 20s linear infinite;
-        }
-        @keyframes scrollStars {
-            0% { background-position: 0 0; }
-            100% { background-position: -800px 0; }
-        }
-        #character {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            font-size: 24px;
-            line-height: 32px;
-            top: 300px;
-            left: 100px;
-            background: #ff0000; /* Röd gubbe */
-            color: #0000ff; /* Blå detaljer */
-            text-align: center;
-            padding: 2px;
-            box-sizing: border-box;
-            image-rendering: pixelated;
-            transition: top 0.1s ease-out, left 0.1s ease-out;
-        }
-        .fartCloud {
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            font-size: 12px;
-            line-height: 16px;
-            bottom: -20px;
-            left: 8px;
-            opacity: 0;
-            background: #808080; /* Grå moln */
-            color: #ffd700; /* Gul glimt */
-            text-align: center;
-            animation: floatUp 0.8s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; bottom: -20px; transform: scale(1); }
-            50% { transform: scale(1.2) rotate(-10deg); }
-            100% { opacity: 0; bottom: 40px; transform: scale(1); }
-        }
-        .obstacle {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background: #8b4513; /* Brun asteroid */
-            right: 0;
-            line-height: 32px;
-            font-size: 24px;
-            color: #fff;
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .nebula {
-            position: absolute;
-            width: 48px;
-            height: 48px;
-            background: #ff69b4; /* Rosa nebulosa */
-            right: 0;
-            line-height: 48px;
-            font-size: 24px;
-            color: #87ceeb; /* Ljusblå detaljer */
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .blackHole {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background: #000000; /* Svart hål */
-            right: 0;
-            line-height: 32px;
-            font-size: 24px;
-            color: #ffffff; /* Vit kant */
-            text-align: center;
-            box-sizing: border-box;
-        }
-        .bonus {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            background: #ffd700; /* Guld för bonus */
-            right: 0;
-            line-height: 32px;
-            font-size: 24px;
-            color: #000000;
-            text-align: center;
-            box-sizing: border-box;
-        }
-        #score, #highScore, #message {
-            font-size: 24px;
-            margin: 10px;
-        }
-        #tokenInfo {
-            font-size: 20px;
-            margin: 10px;
-        }
-        #restartButton {
-            display: none;
-            padding: 15px 30px;
-            font-size: 20px;
-            background-color: #ff6600;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            margin: 10px;
-        }
-        #restartButton:hover {
-            background-color: #cc5200;
-        }
-        a { color: #00cc00; }
-    </style>
+  <title>Fart Master</title>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
 </head>
 <body>
-    <h1>Fart Frenzy: Cosmic Stink (Test)</h1>
-    <p id="score">CFT: 0</p>
-    <p id="highScore">High Score: 0</p>
-    <div id="gameArea">
-        <div id="backgroundStars"></div>
-        <div id="character">👨‍🦳</div>
-    </div>
-    <p id="message"></p>
-    <p id="tokenInfo">CosmicFart Token (CFT) Address: <span id="tokenAddress">[Launching soon]</span></p>
-    <p><a href="https://twitter.com/FartMasterCoin">Följ oss på Twitter för updates!</a></p>
-    <button id="restartButton" onclick="restartGame()">Restart</button>
+  <script>
+    let player;
+    let fuels = [];
+    let obstacles = [];
+    let fuelCount = 0;
+    let gameOver = false;
 
-    <script>
-        const gameArea = document.getElementById("gameArea");
-        const character = document.getElementById("character");
-        const scoreDisplay = document.getElementById("score");
-        const highScoreDisplay = document.getElementById("highScore");
-        const messageDisplay = document.getElementById("message");
-        const tokenAddress = document.getElementById("tokenAddress");
-        const restartButton = document.getElementById("restartButton");
+    function setup() {
+      createCanvas(800, 400);
+      player = new Player();
+    }
 
-        let score = 0;
-        let characterY = 300; // Startposition i mitten (px)
-        let characterX = 100; // Startposition sidledes
-        let gravity = 2;
-        let baseJumpHeight = -60;
-        let jumpBonus = 0;
-        let glideSpeed = 1; // Hastighet för glid
-        let isGameOver = false;
-        let obstacleSpeed = 3;
-        let obstacleInterval;
-        let difficultyIncrease = 0;
+    function draw() {
+      background(200);
+      
+      if (!gameOver) {
+        player.show();
+        player.update();
 
-        // Ladda high score från localStorage
-        let highScore = localStorage.getItem("fartFrenzyHighScore") || 0;
-        highScoreDisplay.innerText = "High Score: " + highScore;
+        if (frameCount % 60 === 0) fuels.push(new Fuel());
+        if (frameCount % 120 === 0) obstacles.push(new Obstacle());
 
-        // Placera karaktären och hantera rörelse
-        function updateCharacter() {
-            if (!isGameOver) {
-                characterY += gravity;
-                if (characterY > 550) characterY = 550; // Håller gubben ovanför botten
-                if (characterY < 0) characterY = 0;
-                character.style.top = characterY + "px";
-
-                // Sidrörelse (A/D eller piltangenter)
-                document.addEventListener("keydown", (e) => {
-                    if (!isGameOver) {
-                        if (e.code === "KeyA" || e.code === "ArrowLeft") {
-                            characterX = Math.max(characterX - 5, 0); // Flytta vänster, stanna vid kant
-                        } else if (e.code === "KeyD" || e.code === "ArrowRight") {
-                            characterX = Math.min(characterX + 5, 700); // Flytta höger, stanna vid kant
-                        }
-                        character.style.left = characterX + "px";
-                    }
-                });
-            }
+        for (let i = fuels.length - 1; i >= 0; i--) {
+          fuels[i].show();
+          if (player.hits(fuels[i])) {
+            fuelCount += fuels[i].value;
+            fuels.splice(i, 1);
+          }
         }
 
-        // Hoppa eller glid med mus eller mellanslag
-        document.addEventListener("click", jump);
-        document.addEventListener("keydown", (e) => {
-            if (!isGameOver) {
-                if (e.code === "Space") {
-                    if (e.repeat) {
-                        glide(); // Håll Space för glid
-                    } else {
-                        jump(); // Klick/Space för hopp
-                    }
-                }
-            }
-        });
-        document.addEventListener("keyup", (e) => {
-            if (e.code === "Space") {
-                stopGlide(); // Sluta glid när Space släpps
-            }
-        });
-
-        function jump() {
-            if (!isGameOver) {
-                jumpBonus = Math.min(jumpBonus + 5, 30);
-                const totalJump = baseJumpHeight - jumpBonus;
-                characterY += totalJump;
-                if (characterY < 0) characterY = 0;
-                showFartCloud();
-                jumpBonus = 0;
-            }
+        for (let i = obstacles.length - 1; i >= 0; i--) {
+          obstacles[i].show();
+          obstacles[i].update();
+          if (player.hits(obstacles[i])) {
+            endGame();
+          }
         }
+      }
+    }
 
-        function glide() {
-            if (!isGameOver && characterY > 0) {
-                characterY -= glideSpeed; // Långsam uppåtriktad glid
-                showFartCloud(); // Visa moln under glid
-                if (characterY < 0) characterY = 0;
-                character.style.top = characterY + "px";
-            }
-        }
+    function endGame() {
+      gameOver = true;
+      let fartScore = calculateFart(fuelCount);
+      textSize(32);
+      textAlign(CENTER);
+      text(`Fart Score: ${fartScore}`, width / 2, height / 2);
+    }
 
-        function stopGlide() {
-            // Ingen action, bara avsluta glid-logik
-        }
+    function calculateFart(fuel) {
+      if (fuel > 60) return 10000;
+      if (fuel > 30) return 2000;
+      if (fuel > 10) return 500;
+      return 100;
+    }
 
-        // Visa gasmoln vid hopp/glid
-        function showFartCloud() {
-            const cloud = document.createElement("div");
-            cloud.className = "fartCloud";
-            cloud.innerText = "💨";
-            gameArea.appendChild(cloud);
-            cloud.style.left = (characterX + 16) + "px"; // Centrera molnet under gubben
-            cloud.style.bottom = (600 - characterY - 32) + "px";
-            setTimeout(() => cloud.remove(), 800);
-        }
+    function keyPressed() {
+      if (keyCode === UP_ARROW) player.jump();
+    }
 
-        // Skapa hinder med slumpmässiga typer
-        function createObstacle() {
-            if (!isGameOver) {
-                const types = ['asteroid', 'nebula', 'blackHole'];
-                const type = types[Math.floor(Math.random() * types.length)];
-                let obstacle;
-                if (type === 'asteroid') {
-                    obstacle = document.createElement("div");
-                    obstacle.className = "obstacle";
-                    obstacle.innerText = "⬜";
-                } else if (type === 'nebula') {
-                    obstacle = document.createElement("div");
-                    obstacle.className = "nebula";
-                    obstacle.innerText = "☁";
-                } else {
-                    obstacle = document.createElement("div");
-                    obstacle.className = "blackHole";
-                    obstacle.innerText = "⚫";
-                }
-                obstacle.style.top = Math.random() * 500 + "px"; // Slumpmässig höjd
-                if (score > 300 && Math.random() < 0.2) obstacle.style.top = "520px"; // Bottenhinder
-                gameArea.appendChild(obstacle);
+    class Player {
+      constructor() {
+        this.x = 100;
+        this.y = height - 50;
+        this.velocity = 0;
+        this.gravity = 0.6;
+      }
+      show() {
+        fill(255, 0, 0);
+        rect(this.x, this.y, 30, 30);
+      }
+      update() {
+        this.velocity += this.gravity;
+        this.y += this.velocity;
+        if (this.y > height - 50) this.y = height - 50, this.velocity = 0;
+        if (keyIsDown(LEFT_ARROW)) this.x -= 5;
+        if (keyIsDown(RIGHT_ARROW)) this.x += 5;
+      }
+      jump() {
+        if (this.y === height - 50) this.velocity = -12;
+      }
+      hits(obj) {
+        return collideRectRect(this.x, this.y, 30, 30, obj.x, obj.y, obj.w, obj.h);
+      }
+    }
 
-                let obstacleX = 800;
-                const currentSpeed = obstacleSpeed + difficultyIncrease;
-                const moveObstacle = setInterval(() => {
-                    if (!isGameOver) {
-                        obstacleX -= currentSpeed;
-                        obstacle.style.right = (800 - obstacleX) + "px";
-                        if (obstacleX < 32 && obstacleX > 0) {
-                            const obstacleRect = obstacle.getBoundingClientRect();
-                            const characterRect = character.getBoundingClientRect();
-                            if (characterRect.top < obstacleRect.bottom && characterRect.bottom > obstacleRect.top &&
-                                characterRect.left < obstacleRect.right && characterRect.right > obstacleRect.left) {
-                                gameOver();
-                            }
-                        }
-                        if (obstacleX < -32) {
-                            obstacle.remove();
-                            score += 10;
-                            scoreDisplay.innerText = "CFT: " + score;
-                            difficultyIncrease = Math.min(difficultyIncrease + 0.3, 10);
-                            if (score > highScore) {
-                                highScore = score;
-                                localStorage.setItem("fartFrenzyHighScore", highScore);
-                                highScoreDisplay.innerText = "High Score: " + highScore;
-                            }
-                            clearInterval(moveObstacle);
-                        }
-                    } else {
-                        clearInterval(moveObstacle);
-                    }
-                }, 16);
-            }
-        }
+    class Fuel {
+      constructor() {
+        this.x = width;
+        this.y = random(height - 100);
+        this.value = 1;
+        this.w = 20;
+        this.h = 20;
+      }
+      show() {
+        fill(0, 255, 0);
+        rect(this.x, this.y, this.w, this.h);
+        this.x -= 3;
+      }
+    }
 
-        // Skapa bonusar (Golden Farts)
-        function createBonus() {
-            if (!isGameOver && Math.random() < 0.01) { // 1% chans per frame
-                const bonus = document.createElement("div");
-                bonus.className = "bonus";
-                bonus.innerText = "★";
-                bonus.style.top = Math.random() * 500 + "px";
-                bonus.style.right = Math.random() * 600 + "px";
-                gameArea.appendChild(bonus);
-
-                let bonusX = parseInt(bonus.style.right);
-                const moveBonus = setInterval(() => {
-                    if (!isGameOver) {
-                        bonusX -= obstacleSpeed;
-                        bonus.style.right = bonusX + "px";
-                        const bonusRect = bonus.getBoundingClientRect();
-                        const characterRect = character.getBoundingClientRect();
-                        if (characterRect.top < bonusRect.bottom && characterRect.bottom > bonusRect.top &&
-                            characterRect.left < bonusRect.right && characterRect.right > bonusRect.left) {
-                            score += 50;
-                            scoreDisplay.innerText = "CFT: " + score;
-                            if (score > highScore) {
-                                highScore = score;
-                                localStorage.setItem("fartFrenzyHighScore", highScore);
-                                highScoreDisplay.innerText = "High Score: " + highScore;
-                            }
-                            bonus.remove();
-                            clearInterval(moveBonus);
-                        }
-                        if (bonusX < -32) {
-                            bonus.remove();
-                            clearInterval(moveBonus);
-                        }
-                    } else {
-                        clearInterval(moveBonus);
-                    }
-                }, 16);
-            }
-        }
-
-        // Starta spelet
-        function startGame() {
-            if (isGameOver) {
-                score = 0;
-                characterY = 300;
-                characterX = 100;
-                jumpBonus = 0;
-                difficultyIncrease = 0;
-                isGameOver = false;
-                scoreDisplay.innerText = "CFT: 0";
-                messageDisplay.innerText = "";
-                restartButton.style.display = "none";
-                character.innerText = "👨‍🦳";
-                gameArea.innerHTML = '<div id="backgroundStars"></div><div id="character">👨‍🦳</div>';
-                character = document.getElementById("character");
-                obstacleInterval = setInterval(createObstacle, 2000); // Nytt hinder var 2:a sekund
-                setInterval(createBonus, 16); // Bonusar slumpmässigt
-                setInterval(updateCharacter, 16); // Uppdatera position varje frame
-            }
-        }
-
-        // Game over
-        function gameOver() {
-            isGameOver = true;
-            clearInterval(obstacleInterval);
-            messageDisplay.innerText = "Game Over! You collected " + score + " CFT.";
-            restartButton.style.display = "block";
-        }
-
-        // Restart spelet
-        function restartGame() {
-            score = 0;
-            characterY = 300;
-            characterX = 100;
-            jumpBonus = 0;
-            difficultyIncrease = 0;
-            isGameOver = false;
-            scoreDisplay.innerText = "CFT: 0";
-            messageDisplay.innerText = "";
-            restartButton.style.display = "none";
-            gameArea.innerHTML = '<div id="backgroundStars"></div><div id="character">👨‍🦳</div>';
-            character = document.getElementById("character");
-            startGame();
-        }
-
-        // Lägg till token-adress efter lansering
-        function updateTokenAddress() {
-            tokenAddress.innerText = "ABC123...xyz"; // Ersätt med din Pump.fun-adress
-        }
-        // Kör updateTokenAddress() efter lansering genom att ta bort kommentaren nedan
-        // updateTokenAddress();
-
-        // Starta spelet automatiskt när sidan laddas
-        window.onload = () => startGame();
-    </script>
+    class Obstacle {
+      constructor() {
+        this.x = width;
+        this.y = height - 50;
+        this.w = 40;
+        this.h = 40;
+      }
+      show() {
+        fill(0, 0, 255);
+        rect(this.x, this.y, this.w, this.h);
+      }
+      update() {
+        this.x -= 3;
+      }
+    }
+  </script>
 </body>
 </html>

@@ -3,7 +3,6 @@
 <head>
   <title>Fart Master</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/addons/p5.sound.min.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
     canvas { display: block; }
@@ -25,6 +24,8 @@
     let fuels = [];
     let obstacles = [];
     let farts = [];
+    let clouds = []; // Nya moln
+    let powerUps = []; // Nya power-ups
     let fuelCount = 0;
     let gameOver = false;
     let highScore = 0;
@@ -34,12 +35,8 @@
     let fartScore = 0;
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
-    let jumpSound, deathSound;
-
-    function preload() {
-      jumpSound = loadSound('jump_fart.mp3'); // Lokal fil i repot
-      deathSound = loadSound('death_fart.mp3'); // Lokal fil i repot
-    }
+    let coinAngle = 0; // För att animera FartMasterCoin
+    let twitterIconX, twitterIconY; // För Twitter-ikonens position
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -49,13 +46,29 @@
       for (let i = 0; i < 10; i++) {
         farts.push(new BackgroundFart());
       }
+      for (let i = 0; i < 5; i++) {
+        clouds.push(new Cloud());
+      }
+      twitterIconX = width - 50; // Twitter-ikon uppe till höger
+      twitterIconY = 20;
     }
 
     function draw() {
-      background(150, 200, 255);
+      // Gradient-bakgrund
+      for (let i = 0; i < height; i++) {
+        let inter = map(i, 0, height, 0, 1);
+        let c = lerpColor(color(150, 200, 255), color(50, 100, 200), inter);
+        stroke(c);
+        line(0, i, width, i);
+      }
       fill(100, 200, 100);
+      noStroke();
       rect(0, height - 100, width, 100);
 
+      for (let cloud of clouds) {
+        cloud.show();
+        cloud.update();
+      }
       for (let fart of farts) {
         fart.show();
         fart.update();
@@ -73,11 +86,12 @@
         text("🌮 Taco: 3 Fuel", width / 2, height / 2 + 10);
         text("🥚 Egg: 3 Fuel", width / 2, height / 2 + 40);
         text("🍺 Beer: 10 Fuel (Rare)", width / 2, height / 2 + 70);
-        text("Ranks:", width / 2, height / 2 + 110);
-        text("Fart Newbie: 0-1499", width / 2, height / 2 + 140);
-        text("Gas Pro: 1500-4999", width / 2, height / 2 + 170);
-        text("Fart Master: 5000-9999", width / 2, height / 2 + 200);
-        text("Super Fart Legend: 10000+", width / 2, height / 2 + 230);
+        text("Power-Up: 💨 Gas Boost", width / 2, height / 2 + 100);
+        text("Ranks:", width / 2, height / 2 + 130);
+        text("Fart Newbie: 0-1499", width / 2, height / 2 + 160);
+        text("Gas Pro: 1500-4999", width / 2, height / 2 + 190);
+        text("Fart Master: 5000-9999", width / 2, height / 2 + 220);
+        text("Super Fart Legend: 10000+", width / 2, height / 2 + 250);
         player.show();
         player.updateStart();
       } else if (!gameOver) {
@@ -102,6 +116,9 @@
           else if (chance < 0.97) fuels.push(new Fuel(3, "🥚"));
           else fuels.push(new Fuel(10, "🍺"));
         }
+        if (frameCount % 200 === 0) {
+          powerUps.push(new PowerUp()); // Power-up spawnar mer sällan
+        }
         if (frameCount % 100 === 0) {
           obstacles.push(new Obstacle(random(1) > 0.5));
         }
@@ -114,6 +131,16 @@
             fuels.splice(i, 1);
           }
           if (fuels[i].x < -20) fuels.splice(i, 1);
+        }
+
+        for (let i = powerUps.length - 1; i >= 0; i--) {
+          powerUps[i].show();
+          powerUps[i].update();
+          if (player.hits(powerUps[i])) {
+            player.boostTimer = 180; // 3 sekunder boost (60 fps * 3)
+            powerUps.splice(i, 1);
+          }
+          if (powerUps[i].x < -20) powerUps.splice(i, 1);
         }
 
         for (let i = obstacles.length - 1; i >= 0; i--) {
@@ -131,6 +158,7 @@
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
         drawCoin(width / 2, 65);
+        drawTwitterIcon(twitterIconX, twitterIconY); // Twitter-ikon
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -165,6 +193,7 @@
     function drawCoin(x, y) {
       push();
       translate(x, y);
+      rotate(coinAngle); // Snurrar myntet
       fill(255, 215, 0);
       ellipse(0, 0, 40, 40);
       fill(0, 255, 0);
@@ -177,6 +206,27 @@
       ellipse(0, 0, 42, 42);
       noStroke();
       pop();
+      coinAngle += 0.05; // Snurrhastighet
+    }
+
+    function drawTwitterIcon(x, y) {
+      push();
+      translate(x, y);
+      fill(29, 161, 242); // Twitter-blå
+      ellipse(0, 0, 30, 30);
+      fill(255);
+      textSize(18);
+      textAlign(CENTER, CENTER);
+      text("🐦", 0, 2); // Twitter-fågel (enkel emoji)
+      pop();
+    }
+
+    function mousePressed() {
+      // Kolla om klick är på Twitter-ikonen
+      let d = dist(mouseX, mouseY, twitterIconX, twitterIconY);
+      if (d < 15) { // Radien på ikonen är 15
+        window.open("https://twitter.com/DITT_TWITTER_ANVÄNDARNAMN", "_blank"); // Byt till ditt konto
+      }
     }
 
     function endGame() {
@@ -184,7 +234,6 @@
       fartScene = true;
       fartEffect = map(fuelCount, 0, 50, 20, 60);
       fartScore = 0;
-      if (deathSound) deathSound.play();
     }
 
     function updateRank() {
@@ -211,6 +260,7 @@
       fuelCount = 0;
       fuels = [];
       obstacles = [];
+      powerUps = [];
       player = new Player();
       fartScene = false;
       fartEffect = 0;
@@ -231,16 +281,25 @@
         this.armAngle = 0;
         this.jumpFart = 0;
         this.blinkTimer = random(60, 120);
+        this.boostTimer = 0; // Timer för Gas Boost
       }
       show() {
         push();
         translate(this.x, this.y);
+        
+        // Jetpack med gas-effekt om boost är aktiv
         fill(150, 150, 150);
         rect(5, 20, 10, 20, 5);
         fill(255, 100, 0);
-        ellipse(10, 40, 10, 15);
+        ellipse(10, 40, 10, this.boostTimer > 0 ? 20 : 15); // Större flamma vid boost
+        if (this.boostTimer > 0) {
+          fill(0, 255, 0, 100);
+          ellipse(10, 45, 15, 10); // Extra gas-effekt
+        }
+        
         fill(0, 200, 0);
         rect(15, 20, 20, 30, 5);
+        
         fill(255, 0, 0);
         beginShape();
         vertex(15, 20);
@@ -248,32 +307,40 @@
         vertex(30 + sin(this.armAngle) * 5, 40);
         vertex(20 - sin(this.armAngle) * 5, 40);
         endShape(CLOSE);
+        
         fill(255, 200, 150);
         ellipse(25, 15, 20, 20);
-        fill(255, 215, 0);
+        
+        // Blinkande krona
+        fill(this.boostTimer > 0 || frameCount % 20 < 10 ? 255 : 200, 215, 0); // Blinkar eller lyser vid boost
         triangle(20, 10, 25, 5, 30, 10);
         ellipse(25, 10, 10, 5);
+        
         fill(255);
         ellipse(22, 13, 6, 6); ellipse(28, 13, 6, 6);
         if (frameCount % this.blinkTimer > 5) {
           fill(0);
           ellipse(22, 13, 3, 3); ellipse(28, 13, 3, 3);
         }
+        
         noFill();
         stroke(0);
         strokeWeight(2);
         arc(25, 18, 8, 4, 0, PI);
         noStroke();
+        
         stroke(0, 200, 0);
         strokeWeight(4);
         line(15, 25, 10 + sin(this.armAngle) * 5, 35);
         line(35, 25, 40 - sin(this.armAngle) * 5, 35);
         noStroke();
+        
         stroke(0, 200, 0);
         strokeWeight(4);
         line(20, 50, 20 + sin(this.legAngle) * 5, 60);
         line(30, 50, 30 - sin(this.legAngle) * 5, 60);
         noStroke();
+        
         pop();
         if (this.velocity === 0) {
           this.legAngle += 0.2;
@@ -328,9 +395,10 @@
           this.velocity = 0;
           this.jumpsLeft = 2;
         }
-        if (keyIsDown(LEFT_ARROW)) this.x -= 6;
-        if (keyIsDown(RIGHT_ARROW)) this.x += 6;
+        if (keyIsDown(LEFT_ARROW)) this.x -= this.boostTimer > 0 ? 9 : 6; // Snabbare med boost
+        if (keyIsDown(RIGHT_ARROW)) this.x += this.boostTimer > 0 ? 9 : 6;
         this.x = constrain(this.x, 0, width - this.width);
+        if (this.boostTimer > 0) this.boostTimer--; // Minskar boost-tiden
       }
       updateStart() {
         this.y = height - 140;
@@ -340,7 +408,6 @@
           this.velocity = -12;
           this.jumpsLeft--;
           this.jumpFart = 10;
-          if (jumpSound) jumpSound.play();
         }
       }
       hits(obj) {
@@ -366,6 +433,25 @@
         textSize(25);
         fill(0);
         text(this.emoji, this.x, this.y + 25);
+        pop();
+      }
+      update() {
+        this.x -= 5;
+      }
+    }
+
+    class PowerUp {
+      constructor() {
+        this.x = width;
+        this.y = random(height - 250, height - 140);
+        this.w = 25;
+        this.h = 25;
+      }
+      show() {
+        push();
+        textSize(25);
+        fill(0, 255, 0);
+        text("💨", this.x, this.y + 25);
         pop();
       }
       update() {
@@ -417,8 +503,35 @@
       }
     }
 
+    class Cloud {
+      constructor() {
+        this.x = random(width);
+        this.y = random(50, height - 200);
+        this.speed = random(0.5, 1.5);
+        this.size = random(50, 100);
+      }
+      show() {
+        push();
+        fill(255, 255, 255, 200);
+        noStroke();
+        ellipse(this.x, this.y, this.size, this.size * 0.6);
+        ellipse(this.x + this.size * 0.3, this.y - this.size * 0.2, this.size * 0.8, this.size * 0.5);
+        ellipse(this.x - this.size * 0.3, this.y + this.size * 0.1, this.size * 0.7, this.size * 0.4);
+        pop();
+      }
+      update() {
+        this.x -= this.speed;
+        if (this.x < -this.size) {
+          this.x = width + this.size;
+          this.y = random(50, height - 200);
+          this.speed = random(0.5, 1.5);
+        }
+      }
+    }
+
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
+      twitterIconX = width - 50; // Justera ikonens position vid resize
     }
   </script>
 </body>

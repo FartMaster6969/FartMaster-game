@@ -20,23 +20,30 @@
             margin: 20px auto;
             border: 2px solid #fff;
             overflow: hidden;
+            font-family: monospace; /* För att hålla pixelart snygg */
         }
         #character {
             position: absolute;
             width: 50px;
             height: 50px;
-            font-size: 50px;
-            line-height: 50px;
+            font-size: 12px;
+            line-height: 16px;
             top: 50%;
             left: 50px;
-            transition: top 0.2s;
+            background: #00ff00; /* Grön för gubbe */
+            color: #000;
+            text-align: center;
+            padding: 2px;
+            box-sizing: border-box;
         }
         .fartCloud {
             position: absolute;
-            font-size: 30px;
+            font-size: 12px;
             bottom: -20px;
             left: 15px;
             opacity: 0;
+            color: #fff;
+            background: #ffffff;
             animation: floatUp 1s ease-out forwards;
         }
         @keyframes floatUp {
@@ -47,12 +54,14 @@
             position: absolute;
             width: 50px;
             height: 100px;
-            background: #ff0000;
-            opacity: 0.7;
+            background: #8b4513; /* Brun för tegelmur */
             right: 0;
-            line-height: 100px;
-            font-size: 30px;
-            color: #fff;
+            line-height: 25px;
+            font-size: 12px;
+            color: #000;
+            text-align: center;
+            padding: 2px;
+            box-sizing: border-box;
         }
         #score, #message {
             font-size: 24px;
@@ -83,7 +92,7 @@
     <h1>Flappy Fart</h1>
     <p id="score">FMC: 0</p>
     <div id="gameArea">
-        <div id="character">👨‍🦳</div>
+        <div id="character">██<br>█<br>█</div> <!-- Pixelart-gubbe -->
     </div>
     <p id="message"></p>
     <p id="tokenInfo">FartMaster Coin (FMC) Address: <span id="tokenAddress">[Launching soon]</span></p>
@@ -101,7 +110,8 @@
         let score = 0;
         let characterY = 300; // Startposition i mitten (px)
         let gravity = 2;
-        let jumpHeight = -40;
+        let baseJumpHeight = -40; // Bas-höjd för hopp
+        let jumpBonus = 0; // Extra höjd per klick, ökar med 5 per hopp (max 20)
         let isGameOver = false;
         let obstacleSpeed = 3;
         let obstacleInterval;
@@ -126,9 +136,13 @@
 
         function jump() {
             if (!isGameOver) {
-                characterY += jumpHeight;
+                // Öka hopphöjden lite per klick (max +20)
+                jumpBonus = Math.min(jumpBonus + 5, 20);
+                const totalJump = baseJumpHeight - jumpBonus; // Lägre värde = högre hopp
+                characterY += totalJump;
                 if (characterY < 0) characterY = 0; // Förhindra att gå över toppen
                 showFartCloud(); // Visa gasmoln vid hopp
+                jumpBonus = 0; // Återställ bonus efter hopp
             }
         }
 
@@ -136,17 +150,17 @@
         function showFartCloud() {
             const cloud = document.createElement("div");
             cloud.className = "fartCloud";
-            cloud.innerText = "💨";
+            cloud.innerText = "█\n█"; // Pixelart-fismoln
             character.appendChild(cloud);
             setTimeout(() => cloud.remove(), 1000); // Ta bort efter 1 sekund
         }
 
-        // Skapa hinder
+        // Skapa hinder (tegelmur)
         function createObstacle() {
             if (!isGameOver) {
                 const obstacle = document.createElement("div");
                 obstacle.className = "obstacle";
-                obstacle.innerText = "🌿"; // Placeholder för hinder (t.ex. bönor eller väggar)
+                obstacle.innerText = "██\n██\n██\n██"; // Pixelart-tegelmur
                 obstacle.style.top = Math.random() * 400 + "px"; // Slumpmässig höjd
                 gameArea.appendChild(obstacle);
 
@@ -193,11 +207,12 @@
         function restartGame() {
             score = 0;
             characterY = 300;
+            jumpBonus = 0; // Återställ hoppbonus
             isGameOver = false;
             scoreDisplay.innerText = "FMC: 0";
             messageDisplay.innerText = "";
             restartButton.style.display = "none"; // Dölj restart-knappen
-            gameArea.innerHTML = '<div id="character">👨‍🦳</div>'; // Återställ karaktär
+            gameArea.innerHTML = '<div id="character">██<br>█<br>█</div>'; // Återställ pixelart-gubbe
             character = document.getElementById("character");
             startGame();
         }

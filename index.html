@@ -1,75 +1,258 @@
-<!-- HTML -->
-<div id="gameArea">
-    <div id="character">█ █<br>███ █<br>█ █ █<br>█ █</div> <!-- Avancerad pixelart-gubbe -->
-    <div id="background"></div> <!-- Scrollande bakgrund (moln/gräs) -->
-</div>
-<audio id="fartSound" src="fart.mp3"></audio>
-<audio id="hitSound" src="boing.mp3"></audio>
-
-<!-- CSS -->
-#background {
-    position: absolute;
-    width: 1600px; /* Dubbel skärmbredd för scroll */
-    height: 600px;
-    background: url('pixel_clouds.png') repeat-x;
-    animation: scrollBackground 10s linear infinite;
-}
-@keyframes scrollBackground {
-    0% { background-position: 0 0; }
-    100% { background-position: -800px 0; }
-}
-.fartCloud {
-    animation: floatUp 0.8s ease-out forwards;
-}
-@keyframes floatUp {
-    0% { opacity: 1; bottom: -20px; transform: scale(1); }
-    50% { transform: scale(1.5) rotate(-10deg); }
-    100% { opacity: 0; bottom: 40px; transform: scale(1); }
-}
-
-<!-- JavaScript -->
-function jump() {
-    if (!isGameOver) {
-        jumpBonus = Math.min(jumpBonus + 5, 30);
-        const totalJump = baseJumpHeight - jumpBonus;
-        characterY += totalJump;
-        if (characterY < 0) characterY = 0;
-        showFartCloud();
-        document.getElementById("fartSound").play(); // Spela fis-ljud
-        jumpBonus = 0;
-    }
-}
-function createObstacle() {
-    if (!isGameOver) {
-        const obstacle = document.createElement("div");
-        obstacle.className = "obstacle";
-        obstacle.innerText = "█ █\n█ █\n█ █\n█ █";
-        obstacle.style.top = Math.random() * 400 + "px";
-        // Lägg till bottenhinder med 20% chans
-        if (Math.random() < 0.2 && score > 300) {
-            obstacle.style.top = "520px"; // Nära botten
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flappy Fart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
-        gameArea.appendChild(obstacle);
-        // Resten av funktionen som tidigare, med ökad svårighet
-    }
-}
-function gameOver() {
-    isGameOver = true;
-    clearInterval(obstacleInterval);
-    messageDisplay.innerText = "Game Over! You collected " + score + " FMC. Share your score!";
-    restartButton.style.display = "block";
-    document.getElementById("hitSound").play(); // Spela game over-ljud
-}
-function restartGame() {
-    score = 0;
-    characterY = 300;
-    jumpBonus = 0;
-    difficultyIncrease = 0;
-    isGameOver = false;
-    scoreDisplay.innerText = "FMC: 0";
-    messageDisplay.innerText = "";
-    restartButton.style.display = "none";
-    gameArea.innerHTML = '<div id="character">█ █<br>███ █<br>█ █ █<br>█ █</div>';
-    character = document.getElementById("character");
-    startGame();
-}
+        #gameArea {
+            position: relative;
+            width: 800px; /* Fördubblad bredd för större skärm */
+            height: 600px;
+            background: linear-gradient(#87ceeb, #e0f6ff); /* Himmelblå bakgrund */
+            margin: 20px auto;
+            border: 2px solid #fff;
+            overflow: hidden;
+            font-family: monospace; /* För att hålla pixelart snygg */
+        }
+        #character {
+            position: absolute;
+            width: 64px; /* Större för avancerad pixelart */
+            height: 64px;
+            font-size: 8px;
+            line-height: 8px;
+            top: 50%;
+            left: 100px; /* Startar längre in för att ge mer reaktionstid */
+            background: #ff0000; /* Röd bas för Mario-liknande karaktär */
+            color: #0000ff; /* Blå detaljer */
+            text-align: center;
+            padding: 2px;
+            box-sizing: border-box;
+            image-rendering: pixelated; /* Behåller pixelart-utseendet */
+            transition: top 0.1s ease-out; /* Smidigare rörelse */
+        }
+        .fartCloud {
+            position: absolute;
+            font-size: 12px;
+            bottom: -20px;
+            left: 20px;
+            opacity: 0;
+            color: #ffffff;
+            background: #808080; /* Grå moln */
+            animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; bottom: -20px; transform: scale(1); }
+            50% { transform: scale(1.2) rotate(-10deg); }
+            100% { opacity: 0; bottom: 40px; transform: scale(1); }
+        }
+        .obstacle {
+            position: absolute;
+            width: 64px; /* Större för pixelart-tegel */
+            height: 96px;
+            background: #a0522d; /* Brun tegelmur */
+            right: 0;
+            line-height: 24px;
+            font-size: 8px;
+            color: #ffd700; /* Gul detalj för tegel */
+            text-align: center;
+            padding: 2px;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        #score, #highScore, #message {
+            font-size: 24px;
+            margin: 10px;
+        }
+        #tokenInfo {
+            font-size: 20px;
+            margin: 10px;
+        }
+        #startButton, #restartButton {
+            display: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            background-color: #ff6600;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            margin: 10px;
+        }
+        #startButton:hover, #restartButton:hover {
+            background-color: #cc5200;
+        }
+        a { color: #00cc00; }
+    </style>
+</head>
+<body>
+    <h1>Flappy Fart</h1>
+    <p id="score">FMC: 0</p>
+    <p id="highScore">High Score: 0</p>
+    <div id="gameArea">
+        <div id="character">█ █<br>███ █<br>█ █ █<br>█ █</div> <!-- Avancerad pixelart-gubbe (Mario-liknande) -->
+    </div>
+    <p id="message"></p>
+    <p id="tokenInfo">FartMaster Coin (FMC) Address: <span id="tokenAddress">[Launching soon]</span></p>
+    <p><a href="https://twitter.com/FartMasterCoin">Följ oss på Twitter för updates!</a></p>
+    <button id="startButton" onclick="startGame()">Start</button>
+    <button id="restartButton" onclick="restartGame()">Restart</button>
+
+    <script>
+        const gameArea = document.getElementById("gameArea");
+        const character = document.getElementById("character");
+        const scoreDisplay = document.getElementById("score");
+        const highScoreDisplay = document.getElementById("highScore");
+        const messageDisplay = document.getElementById("message");
+        const tokenAddress = document.getElementById("tokenAddress");
+        const startButton = document.getElementById("startButton");
+        const restartButton = document.getElementById("restartButton");
+
+        let score = 0;
+        let characterY = 300; // Startposition i mitten (px)
+        let gravity = 2;
+        let baseJumpHeight = -50; // Högre bas-hopp för att matcha större skärm
+        let jumpBonus = 0; // Extra höjd per klick, ökar med 5 per hopp (max 30)
+        let isGameOver = true; // Startar i paused-läge för startknapp
+        let obstacleSpeed = 3;
+        let obstacleInterval;
+        let difficultyIncrease = 0; // För progressiv svårighet
+
+        // Ladda high score från localStorage
+        let highScore = localStorage.getItem("flappyFartHighScore") || 0;
+        highScoreDisplay.innerText = "High Score: " + highScore;
+
+        // Placera karaktären och hantera hopp
+        function updateCharacter() {
+            if (!isGameOver) {
+                characterY += gravity;
+                if (characterY > 550) characterY = 550; // Håller gubben ovanför botten (kan inte dö vid golv)
+                if (characterY < 0) characterY = 0; // Hindra från att flyga över toppen
+                character.style.top = characterY + "px";
+            }
+        }
+
+        // Hoppa med mus eller mellanslag
+        document.addEventListener("click", () => {
+            if (!isGameOver) jump();
+        });
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space" && !isGameOver) {
+                jump();
+            }
+        });
+
+        function jump() {
+            if (!isGameOver) {
+                // Öka hopphöjden lite per klick (max +30)
+                jumpBonus = Math.min(jumpBonus + 5, 30);
+                const totalJump = baseJumpHeight - jumpBonus; // Lägre värde = högre hopp
+                characterY += totalJump;
+                if (characterY < 0) characterY = 0; // Förhindra att gå över toppen
+                showFartCloud(); // Visa gasmoln vid hopp
+                jumpBonus = 0; // Återställ bonus efter hopp
+            }
+        }
+
+        // Visa gasmoln vid hopp
+        function showFartCloud() {
+            const cloud = document.createElement("div");
+            cloud.className = "fartCloud";
+            cloud.innerText = "█ █"; // Förbättrad pixelart-fismoln
+            character.appendChild(cloud);
+            setTimeout(() => cloud.remove(), 800); // Ta bort efter 0.8 sekunder
+        }
+
+        // Skapa hinder (tegelmur) med progressiv svårighet
+        function createObstacle() {
+            if (!isGameOver) {
+                const obstacle = document.createElement("div");
+                obstacle.className = "obstacle";
+                obstacle.innerText = "█ █\n█ █\n█ █\n█ █"; // Avancerad pixelart-tegelmur
+                obstacle.style.top = Math.random() * 400 + "px"; // Slumpmässig höjd
+                // Lägg till bottenhinder med 20% chans efter 300 poäng
+                if (Math.random() < 0.2 && score > 300) {
+                    obstacle.style.top = "520px"; // Nära botten
+                }
+                gameArea.appendChild(obstacle);
+
+                let obstacleX = 800; // Startar längre bort p.g.a. större skärm
+                const currentSpeed = obstacleSpeed + difficultyIncrease; // Öka hastighet med svårighet
+                const moveObstacle = setInterval(() => {
+                    if (!isGameOver) {
+                        obstacleX -= currentSpeed;
+                        obstacle.style.right = (800 - obstacleX) + "px";
+                        if (obstacleX < 64 && obstacleX > 0) { // Kollision med karaktär (justerat för större bredd)
+                            const obstacleRect = obstacle.getBoundingClientRect();
+                            const characterRect = character.getBoundingClientRect();
+                            if (characterRect.top < obstacleRect.bottom && characterRect.bottom > obstacleRect.top) {
+                                gameOver();
+                            }
+                        }
+                        if (obstacleX < -64) {
+                            obstacle.remove();
+                            score += 10;
+                            scoreDisplay.innerText = "FMC: " + score;
+                            difficultyIncrease = Math.min(difficultyIncrease + 0.2, 8); // Öka svårighet gradvis (max 8)
+                            if (score > highScore) {
+                                highScore = score;
+                                localStorage.setItem("flappyFartHighScore", highScore);
+                                highScoreDisplay.innerText = "High Score: " + highScore;
+                            }
+                            clearInterval(moveObstacle);
+                        }
+                    } else {
+                        clearInterval(moveObstacle);
+                    }
+                }, 16); // Ca 60 FPS
+            }
+        }
+
+        // Starta spelet
+        function startGame() {
+            if (isGameOver) {
+                score = 0;
+                characterY = 300;
+                jumpBonus = 0;
+                isGameOver = false;
+                difficultyIncrease = 0; // Återställ svårighet
+                scoreDisplay.innerText = "FMC: 0";
+                messageDisplay.innerText = "";
+                startButton.style.display = "none"; // Dölj startknappen
+                restartButton.style.display = "none"; // Säkerställ att restart är gömd
+                gameArea.innerHTML = '<div id="character">█ █<br>███ █<br>█ █ █<br>█ █</div>'; // Återställ pixelart-gubbe
+                character = document.getElementById("character");
+                obstacleInterval = setInterval(createObstacle, 2000); // Nytt hinder var 2:a sekund
+                setInterval(updateCharacter, 16); // Uppdatera position varje frame
+            }
+        }
+
+        // Game over
+        function gameOver() {
+            isGameOver = true;
+            clearInterval(obstacleInterval);
+            messageDisplay.innerText = "Game Over! You collected " + score + " FMC.";
+            restartButton.style.display = "block"; // Visa restart-knappen
+        }
+
+        // Lägg till token-adress efter lansering
+        function updateTokenAddress() {
+            tokenAddress.innerText = "ABC123...xyz"; // Ersätt med din Pump.fun-adress
+        }
+        // Kör updateTokenAddress() efter lansering genom att ta bort kommentaren nedan
+        // updateTokenAddress();
+
+        // Starta spelet med startknapp vid laddning
+        window.onload = () => {
+            startButton.style.display = "block"; // Visa startknappen direkt
+        };
+    </script>
+</body>
+</html>

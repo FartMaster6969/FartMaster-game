@@ -27,7 +27,9 @@
     let gameOver = false;
     let highScore = 0;
     let gameStarted = false;
+    let fartScene = false;
     let fartEffect = 0;
+    let fartScore = 0;
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -53,9 +55,8 @@
 
         if (frameCount % 50 === 0) fuels.push(new Fuel(random(1, 5)));
         if (frameCount % 100 === 0) {
-          // 50% chans för stor toalett
-          if (random(1) > 0.5) obstacles.push(new Obstacle(true)); // Stor toalett
-          else obstacles.push(new Obstacle(false)); // Vanlig toalett
+          if (random(1) > 0.5) obstacles.push(new Obstacle(true));
+          else obstacles.push(new Obstacle(false));
         }
 
         for (let i = fuels.length - 1; i >= 0; i--) {
@@ -81,24 +82,33 @@
         textSize(20);
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
-      } else {
+      } else if (fartScene) {
+        // Fis-scen
+        player.showDead();
         if (fartEffect > 0) {
-          textSize(50 + fartEffect);
-          fill(139, 69, 19, fartEffect * 5);
-          text("💨", width / 2, height / 2 - 50);
+          textSize(50 + fartEffect * 5);
+          fill(139, 69, 19, fartEffect * 10);
+          text("💨", player.x + 50, player.y - fartEffect * 5);
           fartEffect--;
+          if (fartEffect === 0) {
+            fartScene = false; // Gå vidare till resultat
+            fartScore = calculateFart(fuelCount);
+            if (fartScore > highScore) highScore = fartScore;
+          }
         }
+      } else {
+        // Resultat efter fis-scen
+        textSize(50);
+        fill(255, 0, 0);
+        text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
         document.getElementById("restartButton").style.display = "block";
       }
     }
 
     function endGame() {
       gameOver = true;
-      let fartScore = calculateFart(fuelCount);
-      if (fartScore > highScore) highScore = fartScore;
-      textSize(50);
-      fill(255, 0, 0);
-      text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
+      fartScene = true;
+      fartEffect = map(fuelCount, 0, 50, 10, 30); // Fis-längd baserat på fuel
     }
 
     function calculateFart(fuel) {
@@ -109,14 +119,14 @@
     }
 
     function keyPressed() {
-      if (key === ' ' || keyCode === 32) { // Mellanslag
+      if (key === ' ' || keyCode === 32) {
         if (!gameStarted) {
           gameStarted = true;
         } else if (!gameOver) {
           player.jump();
         }
       }
-      if (key === 'r' && gameOver) resetGame();
+      if (key === 'r' && gameOver && !fartScene) resetGame();
     }
 
     function resetGame() {
@@ -126,7 +136,9 @@
       fuels = [];
       obstacles = [];
       player = new Player();
+      fartScene = false;
       fartEffect = 0;
+      fartScore = 0;
       document.getElementById("restartButton").style.display = "none";
     }
 
@@ -138,11 +150,15 @@
         this.gravity = 0.7;
         this.width = 40;
         this.height = 40;
-        this.jumpsLeft = 2; // För dubbelhopp
+        this.jumpsLeft = 2;
       }
       show() {
         textSize(40);
         text("🏃", this.x, this.y + 40);
+      }
+      showDead() {
+        textSize(40);
+        text("💀", this.x, this.y + 40); // Dödskalle när du dör
       }
       update() {
         this.velocity += this.gravity;
@@ -150,7 +166,7 @@
         if (this.y > height - 140) {
           this.y = height - 140;
           this.velocity = 0;
-          this.jumpsLeft = 2; // Återställ hopp när du landar
+          this.jumpsLeft = 2;
         }
         if (keyIsDown(LEFT_ARROW)) this.x -= 6;
         if (keyIsDown(RIGHT_ARROW)) this.x += 6;
@@ -161,7 +177,7 @@
       }
       jump() {
         if (this.jumpsLeft > 0) {
-          this.velocity = -12; // Vanligt hopp, räcker för vanlig toalett
+          this.velocity = -12;
           this.jumpsLeft--;
         }
       }
@@ -196,9 +212,9 @@
     class Obstacle {
       constructor(isBig) {
         this.x = width;
-        this.y = height - (isBig ? 190 : 140); // Stor toalett är högre
+        this.y = height - (isBig ? 190 : 140);
         this.w = isBig ? 60 : 50;
-        this.h = isBig ? 100 : 50; // Stor toalett dubbelt så hög
+        this.h = isBig ? 100 : 50;
         this.isBig = isBig;
       }
       show() {

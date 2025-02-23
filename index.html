@@ -88,13 +88,12 @@
           player.jumpFart--;
         }
 
-        // Spawn av mat med ny frekvens
-        if (frameCount % 30 === 0) { // Oftare spawn (var 30:e frame)
+        if (frameCount % 50 === 0) { // Mindre frekvent spawn
           let chance = random(1);
-          if (chance < 0.70) fuels.push(new Fuel(1, "🫘")); // 70% bönor
-          else if (chance < 0.85) fuels.push(new Fuel(3, "🌮")); // 15% tacos
-          else if (chance < 0.95) fuels.push(new Fuel(3, "🥚")); // 10% ägg
-          else fuels.push(new Fuel(10, "🍺")); // 5% öl
+          if (chance < 0.80) fuels.push(new Fuel(1, "🫘")); // 80% bönor
+          else if (chance < 0.90) fuels.push(new Fuel(3, "🌮")); // 10% tacos
+          else if (chance < 0.97) fuels.push(new Fuel(3, "🥚")); // 7% ägg
+          else fuels.push(new Fuel(10, "🍺")); // 3% öl
         }
         if (frameCount % 100 === 0) {
           obstacles.push(new Obstacle(random(1) > 0.5));

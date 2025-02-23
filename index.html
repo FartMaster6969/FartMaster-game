@@ -10,20 +10,18 @@
 </head>
 <body>
   <script>
-    let coinAngle = 0;
-
     function setup() {
       createCanvas(800, 800); // Storlek för högupplöst bild
       textAlign(CENTER, CENTER);
+      noLoop(); // Ingen snurr – bara en stilla bild
     }
 
     function draw() {
-      background(0); // Svart bakgrund för kontrast
+      background(0); // Svart bakgrund
       
-      // Rita stort mynt
+      // Rita stort mynt längre ner
       push();
-      translate(width / 2, height / 2 - 100); // Centrera, flyttar upp lite för texten
-      rotate(coinAngle); // Snurrar som i spelet
+      translate(width / 2, height / 2); // Centrera på mitten av skärmen
       fill(255, 215, 0); // Guld
       ellipse(0, 0, 600, 600); // Stort mynt (600px)
       fill(0, 255, 0); // Grön fis
@@ -37,11 +35,9 @@
       pop();
 
       // Text "ca: soon" under myntet
-      fill(255); // Vit text för kontrast
+      fill(255); // Vit text
       textSize(50);
-      text("ca: soon", width / 2, height / 2 + 250); // Under myntet
-
-      coinAngle += 0.05; // Snurrhastighet
+      text("ca: soon", width / 2, height / 2 + 350); // Längre ner, 350px under mitten
     }
   </script>
 </body>

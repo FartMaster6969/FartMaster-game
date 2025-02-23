@@ -61,11 +61,11 @@
         textSize(30);
         text("Press SPACE to start!", width / 2, height / 2 - 100);
         textSize(20);
-        text("Fart Fuel Sources:", width / 2, height / 2 - 50);
-        text("🫘 Beans: 1 Fuel (Common)", width / 2, height / 2 - 20);
-        text("🌮 Taco: 3 Fuel", width / 2, height / 2 + 10);
-        text("🥚 Egg: 3 Fuel", width / 2, height / 2 + 40);
-        text("🍺 Beer: 10 Fuel (Rare)", width / 2, height / 2 + 70);
+        text("FartMasterCoin Sources:", width / 2, height / 2 - 50);
+        text("🫘 Beans: 1 FMC (Common)", width / 2, height / 2 - 20);
+        text("🌮 Taco: 3 FMC", width / 2, height / 2 + 10);
+        text("🥚 Egg: 3 FMC", width / 2, height / 2 + 40);
+        text("🍺 Beer: 10 FMC (Rare)", width / 2, height / 2 + 70);
         text("Ranks:", width / 2, height / 2 + 110);
         text("Fart Newbie: 0-1499", width / 2, height / 2 + 140);
         text("Gas Pro: 1500-4999", width / 2, height / 2 + 170);
@@ -88,7 +88,7 @@
           player.jumpFart--;
         }
 
-        if (frameCount % 50 === 0) { // Mindre frekvent spawn
+        if (frameCount % 50 === 0) {
           let chance = random(1);
           if (chance < 0.80) fuels.push(new Fuel(1, "🫘")); // 80% bönor
           else if (chance < 0.90) fuels.push(new Fuel(3, "🌮")); // 10% tacos
@@ -118,9 +118,11 @@
           if (obstacles[i].x < -obstacles[i].w) obstacles.splice(i, 1);
         }
 
+        // Rita FartMasterCoin-ikonen bredvid poängen
+        drawCoin(70, 20); // Placering bredvid "FartMasterCoin"
         fill(0);
         textSize(20);
-        text(`Fart Fuel: ${fuelCount}`, 100, 30);
+        text(`FartMasterCoin: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
       } else if (fartScene) {
@@ -152,6 +154,23 @@
         text(`Rank: ${highestRank}`, width / 2, height / 2 + 20);
         document.getElementById("restartButton").style.display = "block";
       }
+    }
+
+    // Funktion för att rita FartMasterCoin
+    function drawCoin(x, y) {
+      push();
+      translate(x, y);
+      fill(255, 215, 0); // Guld
+      ellipse(0, 0, 30, 30); // Mynt
+      fill(0, 255, 0); // Grön fis
+      textSize(16);
+      text("💨", -8, 6); // Centrerad fis-emoji
+      noFill();
+      stroke(200, 150, 0); // Mörkare guldkant
+      strokeWeight(2);
+      ellipse(0, 0, 32, 32); // Kant för 3D-känsla
+      noStroke();
+      pop();
     }
 
     function endGame() {

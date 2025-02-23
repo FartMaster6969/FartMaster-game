@@ -61,11 +61,11 @@
         textSize(30);
         text("Press SPACE to start!", width / 2, height / 2 - 100);
         textSize(20);
-        text("FartMasterCoin Sources:", width / 2, height / 2 - 50);
-        text("🫘 Beans: 1 FMC (Common)", width / 2, height / 2 - 20);
-        text("🌮 Taco: 3 FMC", width / 2, height / 2 + 10);
-        text("🥚 Egg: 3 FMC", width / 2, height / 2 + 40);
-        text("🍺 Beer: 10 FMC (Rare)", width / 2, height / 2 + 70);
+        text("Fart Fuel Sources:", width / 2, height / 2 - 50);
+        text("🫘 Beans: 1 Fuel (Common)", width / 2, height / 2 - 20);
+        text("🌮 Taco: 3 Fuel", width / 2, height / 2 + 10);
+        text("🥚 Egg: 3 Fuel", width / 2, height / 2 + 40);
+        text("🍺 Beer: 10 Fuel (Rare)", width / 2, height / 2 + 70);
         text("Ranks:", width / 2, height / 2 + 110);
         text("Fart Newbie: 0-1499", width / 2, height / 2 + 140);
         text("Gas Pro: 1500-4999", width / 2, height / 2 + 170);
@@ -118,13 +118,12 @@
           if (obstacles[i].x < -obstacles[i].w) obstacles.splice(i, 1);
         }
 
-        // Rita FartMasterCoin-ikonen bredvid poängen
-        drawCoin(70, 20); // Placering bredvid "FartMasterCoin"
         fill(0);
         textSize(20);
-        text(`FartMasterCoin: ${fuelCount}`, 100, 30);
+        text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
+        drawCoin(width / 2, 50); // FartMasterCoin under ranken
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {

@@ -159,7 +159,7 @@
         drawCoin(width / 2, 65);
         textSize(16);
         fill(0);
-        text("ca: soon", width / 2, 95);
+        text("ca: 3cCzRSEK9r2NceEcejHD8vjkB1AEuwYZWexiZiwQpump", width / 2, 95); // Ny CA
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -225,7 +225,10 @@
     }
 
     function mousePressed() {
-      // Ingen länk för Pump.fun-ikonen längre
+      let pumpfunDist = dist(mouseX, mouseY, pumpfunIconX, pumpfunIconY);
+      if (pumpfunDist < 15) {
+        window.open("https://pump.fun/coin/3cCzRSEK9r2NceEcejHD8vjkB1AEuwYZWexiZiwQpump", "_blank"); // Ny Pump.fun-länk
+      }
     }
 
     function endGame() {

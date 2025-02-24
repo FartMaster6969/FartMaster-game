@@ -36,7 +36,6 @@
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
     let coinAngle = 0;
-    let twitterIconX, twitterIconY;
     let pumpfunIconX, pumpfunIconY;
 
     function setup() {
@@ -50,8 +49,6 @@
       for (let i = 0; i < 5; i++) {
         clouds.push(new Cloud());
       }
-      twitterIconX = width - 80;
-      twitterIconY = height - 30;
       pumpfunIconX = width - 40;
       pumpfunIconY = height - 30;
     }
@@ -162,7 +159,7 @@
         drawCoin(width / 2, 65);
         textSize(16);
         fill(0);
-        text("ca: D2ghNuiytqSmocEnw2cdVcNKZVaYJrWRqYnHeYrwpump", width / 2, 95); // Uppdaterad coin-adress
+        text("ca: soon", width / 2, 95); // Tillbaka till "ca: soon"
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -193,8 +190,7 @@
         document.getElementById("restartButton").style.display = "block";
       }
 
-      drawTwitterIcon(twitterIconX, twitterIconY);
-      drawPumpfunIcon(pumpfunIconX, pumpfunIconY);
+      drawPumpfunIcon(pumpfunIconX, pumpfunIconY); // Bara Pump.fun-ikonen kvar
     }
 
     function drawCoin(x, y) {
@@ -216,18 +212,6 @@
       coinAngle += 0.05;
     }
 
-    function drawTwitterIcon(x, y) {
-      push();
-      translate(x, y);
-      fill(29, 161, 242);
-      ellipse(0, 0, 30, 30);
-      fill(255);
-      textSize(18);
-      textAlign(CENTER, CENTER);
-      text("🐦", 0, 2);
-      pop();
-    }
-
     function drawPumpfunIcon(x, y) {
       push();
       translate(x, y);
@@ -241,13 +225,9 @@
     }
 
     function mousePressed() {
-      let twitterDist = dist(mouseX, mouseY, twitterIconX, twitterIconY);
       let pumpfunDist = dist(mouseX, mouseY, pumpfunIconX, pumpfunIconY);
-      if (twitterDist < 15) {
-        window.open("https://x.com/FartMasterGame", "_blank");
-      }
       if (pumpfunDist < 15) {
-        window.open("https://pump.fun/coin/D2ghNuiytqSmocEnw2cdVcNKZVaYJrWRqYnHeYrwpump", "_blank"); // Uppdaterad Pump.fun-länk
+        window.open("https://pump.fun/coin/D2ghNuiytqSmocEnw2cdVcNKZVaYJrWRqYnHeYrwpump", "_blank");
       }
     }
 
@@ -551,8 +531,6 @@
 
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
-      twitterIconX = width - 80;
-      twitterIconY = height - 30;
       pumpfunIconX = width - 40;
       pumpfunIconY = height - 30;
     }

@@ -36,33 +36,41 @@
     let rank = "Fart Newbie";
     let highestRank = "Fart Newbie";
     let coinAngle = 0;
-    let pumpfunIconX, pumpfunIconY;
+    let stars = []; // För ny bakgrund
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
       player = new Player();
       textAlign(CENTER);
       window.focus();
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         farts.push(new BackgroundFart());
       }
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 8; i++) {
         clouds.push(new Cloud());
       }
-      pumpfunIconX = width - 40;
-      pumpfunIconY = height - 30;
+      for (let i = 0; i < 50; i++) {
+        stars.push(new Star()); // Lägger till stjärnor
+      }
     }
 
     function draw() {
+      // Ny bakgrund med gradient och stjärnor
       for (let i = 0; i < height; i++) {
         let inter = map(i, 0, height, 0, 1);
-        let c = lerpColor(color(150, 200, 255), color(50, 100, 200), inter);
+        let c = lerpColor(color(100, 150, 255), color(20, 50, 150), inter);
         stroke(c);
         line(0, i, width, i);
+      }
+      for (let star of stars) {
+        star.show();
+        star.update();
       }
       fill(100, 200, 100);
       noStroke();
       rect(0, height - 100, width, 100);
+      fill(50, 150, 50);
+      rect(0, height - 120, width, 20); // Extra lager på marken
 
       for (let cloud of clouds) {
         cloud.show();
@@ -119,7 +127,8 @@
           powerUps.push(new PowerUp());
         }
         if (frameCount % 100 === 0) {
-          obstacles.push(new Obstacle(random(1) > 0.5));
+          let obstacleType = floor(random(3)); // 0: toalett, 1: stinkbomb, 2: råtta
+          obstacles.push(new Obstacle(obstacleType, random(1) > 0.5));
         }
 
         for (let i = fuels.length - 1; i >= 0; i--) {
@@ -157,9 +166,6 @@
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
         drawCoin(width / 2, 65);
-        textSize(16);
-        fill(0);
-        text("ca: 3cCzRSEK9r2NceEcejHD8vjkB1AEuwYZWexiZiwQpump", width / 2, 95); // Ny CA
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -189,8 +195,6 @@
         text(`Rank: ${highestRank}`, width / 2, height / 2 + 20);
         document.getElementById("restartButton").style.display = "block";
       }
-
-      drawPumpfunIcon(pumpfunIconX, pumpfunIconY);
     }
 
     function drawCoin(x, y) {
@@ -210,25 +214,6 @@
       noStroke();
       pop();
       coinAngle += 0.05;
-    }
-
-    function drawPumpfunIcon(x, y) {
-      push();
-      translate(x, y);
-      fill(255, 165, 0);
-      ellipse(0, 0, 30, 30);
-      fill(255);
-      textSize(18);
-      textAlign(CENTER, CENTER);
-      text("💊", 0, 2);
-      pop();
-    }
-
-    function mousePressed() {
-      let pumpfunDist = dist(mouseX, mouseY, pumpfunIconX, pumpfunIconY);
-      if (pumpfunDist < 15) {
-        window.open("https://pump.fun/coin/3cCzRSEK9r2NceEcejHD8vjkB1AEuwYZWexiZiwQpump", "_blank"); // Ny Pump.fun-länk
-      }
     }
 
     function endGame() {
@@ -460,18 +445,21 @@
     }
 
     class Obstacle {
-      constructor(isBig) {
+      constructor(type, isBig) {
         this.x = width;
         this.y = height - (isBig ? 190 : 140);
         this.w = isBig ? 60 : 50;
         this.h = isBig ? 100 : 50;
+        this.type = type; // 0: toalett, 1: stinkbomb, 2: råtta
         this.isBig = isBig;
       }
       show() {
         push();
         textSize(this.h);
         fill(0);
-        text("🚽", this.x, this.y + this.h);
+        if (this.type === 0) text("🚽", this.x, this.y + this.h); // Toalett
+        else if (this.type === 1) text("💣", this.x, this.y + this.h); // Stinkbomb
+        else text("🐀", this.x, this.y + this.h); // Råtta
         pop();
       }
       update() {
@@ -529,10 +517,32 @@
       }
     }
 
+    class Star {
+      constructor() {
+        this.x = random(width);
+        this.y = random(height - 120);
+        this.size = random(2, 5);
+        this.speed = random(0.1, 0.5);
+      }
+      show() {
+        push();
+        fill(255, 255, 150);
+        noStroke();
+        ellipse(this.x, this.y, this.size, this.size);
+        pop();
+      }
+      update() {
+        this.x -= this.speed;
+        if (this.x < 0) {
+          this.x = width;
+          this.y = random(height - 120);
+          this.speed = random(0.1, 0.5);
+        }
+      }
+    }
+
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
-      pumpfunIconX = width - 40;
-      pumpfunIconY = height - 30;
     }
   </script>
 </body>

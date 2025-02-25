@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Fart Master</title>
+  <title>Survive the Trenches</title>
   <script src="https://cdn.jsdelivr.net/npm/p5@1.4.2/lib/p5.js"></script>
   <style>
     body { margin: 0; padding: 0; overflow: hidden; }
@@ -33,10 +33,10 @@
     let fartScene = false;
     let fartEffect = 0;
     let fartScore = 0;
-    let rank = "Fart Newbie";
-    let highestRank = "Fart Newbie";
+    let rank = "Trench Rookie";
+    let highestRank = "Trench Rookie";
     let coinAngle = 0;
-    let stars = []; // För ny bakgrund
+    let tokenRest = []; // Ersätter stjärnor
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -50,27 +50,27 @@
         clouds.push(new Cloud());
       }
       for (let i = 0; i < 50; i++) {
-        stars.push(new Star()); // Lägger till stjärnor
+        tokenRest.push(new TokenRest());
       }
     }
 
     function draw() {
-      // Ny bakgrund med gradient och stjärnor
+      // Ny trenches-bakgrund
       for (let i = 0; i < height; i++) {
         let inter = map(i, 0, height, 0, 1);
-        let c = lerpColor(color(100, 150, 255), color(20, 50, 150), inter);
+        let c = lerpColor(color(50, 50, 100), color(10, 10, 30), inter);
         stroke(c);
         line(0, i, width, i);
       }
-      for (let star of stars) {
-        star.show();
-        star.update();
+      for (let token of tokenRest) {
+        token.show();
+        token.update();
       }
-      fill(100, 200, 100);
+      fill(80, 40, 20); // Sprucken jord
       noStroke();
       rect(0, height - 100, width, 100);
-      fill(50, 150, 50);
-      rect(0, height - 120, width, 20); // Extra lager på marken
+      fill(50, 30, 10); // Trench-skit
+      rect(0, height - 120, width, 20);
 
       for (let cloud of clouds) {
         cloud.show();
@@ -83,22 +83,22 @@
 
       if (!gameStarted) {
         textSize(40);
-        fill(0);
-        text("Fart Master", width / 2, height / 2 - 150);
+        fill(255);
+        text("Survive the Trenches", width / 2, height / 2 - 150);
         textSize(30);
-        text("Press SPACE to start!", width / 2, height / 2 - 100);
+        text("Press SPACE to survive!", width / 2, height / 2 - 100);
         textSize(20);
         text("Fart Fuel Sources:", width / 2, height / 2 - 50);
         text("🫘 Beans: 1 Fuel (Common)", width / 2, height / 2 - 20);
         text("🌮 Taco: 3 Fuel", width / 2, height / 2 + 10);
         text("🥚 Egg: 3 Fuel", width / 2, height / 2 + 40);
         text("🍺 Beer: 10 Fuel (Rare)", width / 2, height / 2 + 70);
-        text("Power-Up: 💨 Gas Boost", width / 2, height / 2 + 100);
+        text("Power-Up: 💨 Trench Boost", width / 2, height / 2 + 100);
         text("Ranks:", width / 2, height / 2 + 130);
-        text("Fart Newbie: 0-1499", width / 2, height / 2 + 160);
-        text("Gas Pro: 1500-4999", width / 2, height / 2 + 190);
-        text("Fart Master: 5000-9999", width / 2, height / 2 + 220);
-        text("Super Fart Legend: 10000+", width / 2, height / 2 + 250);
+        text("Trench Rookie: 0-1499", width / 2, height / 2 + 160);
+        text("Degen Survivor: 1500-4999", width / 2, height / 2 + 190);
+        text("Rug Slayer: 5000-9999", width / 2, height / 2 + 220);
+        text("Trenches King: 10000+", width / 2, height / 2 + 250);
         player.show();
         player.updateStart();
       } else if (!gameOver) {
@@ -110,7 +110,7 @@
           translate(player.x - 20, player.y + 40);
           scale(-1, 1);
           textSize(20 + player.jumpFart * 2);
-          fill(0, 255, 0, player.jumpFart * 20);
+          fill(0, 200, 0, player.jumpFart * 20); // Mörkare grön för trenches
           text("💨", 0, 0);
           pop();
           player.jumpFart--;
@@ -127,7 +127,7 @@
           powerUps.push(new PowerUp());
         }
         if (frameCount % 100 === 0) {
-          let obstacleType = floor(random(3)); // 0: toalett, 1: stinkbomb, 2: råtta
+          let obstacleType = floor(random(3)); // 0: rug bomb, 1: scam rat, 2: dead pump
           obstacles.push(new Obstacle(obstacleType, random(1) > 0.5));
         }
 
@@ -160,7 +160,7 @@
           if (obstacles[i].x < -obstacles[i].w) obstacles.splice(i, 1);
         }
 
-        fill(0);
+        fill(255);
         textSize(20);
         text(`Fart Fuel: ${fuelCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
@@ -171,12 +171,12 @@
         if (fartEffect > 0) {
           push();
           textSize(50 + fartEffect * 3);
-          fill(0, 255, 0, fartEffect * 3);
+          fill(0, 200, 0, fartEffect * 3);
           text("💨", player.x + 50, player.y - fartEffect * 5);
           pop();
           fartScore = Math.floor((60 - fartEffect) * fuelCount * 0.5);
           if (fartScore < 0) fartScore = 0;
-          fill(0);
+          fill(255);
           textSize(30);
           text(`Fart Score: ${fartScore}`, width / 2, height / 2 + 20);
           if (frameCount % 3 === 0) fartEffect--;
@@ -189,9 +189,9 @@
       } else {
         textSize(50);
         fill(255, 0, 0);
-        text(`BOOM! Fart Score: ${fartScore}`, width / 2, height / 2 - 20);
+        text(`Rugged in the Trenches!`, width / 2, height / 2 - 20);
         textSize(30);
-        fill(0);
+        fill(255);
         text(`Rank: ${highestRank}`, width / 2, height / 2 + 20);
         document.getElementById("restartButton").style.display = "block";
       }
@@ -201,14 +201,14 @@
       push();
       translate(x, y);
       rotate(coinAngle);
-      fill(255, 215, 0);
+      fill(200, 150, 0); // Smutsigare guld för trenches
       ellipse(0, 0, 40, 40);
-      fill(0, 255, 0);
+      fill(0, 200, 0); // Mörkare grön
       textSize(20);
       textAlign(CENTER, CENTER);
       text("💨", 0, 0);
       noFill();
-      stroke(200, 150, 0);
+      stroke(150, 100, 0); // Mörkare kant
       strokeWeight(2);
       ellipse(0, 0, 42, 42);
       noStroke();
@@ -224,10 +224,10 @@
     }
 
     function updateRank() {
-      if (fartScore >= 10000) highestRank = "Super Fart Legend";
-      else if (fartScore >= 5000 && highestRank != "Super Fart Legend") highestRank = "Fart Master";
-      else if (fartScore >= 1500 && highestRank != "Super Fart Legend" && highestRank != "Fart Master") highestRank = "Gas Pro";
-      else if (highestRank == "Fart Newbie") highestRank = "Fart Newbie";
+      if (fartScore >= 10000) highestRank = "Trenches King";
+      else if (fartScore >= 5000 && highestRank != "Trenches King") highestRank = "Rug Slayer";
+      else if (fartScore >= 1500 && highestRank != "Trenches King" && highestRank != "Rug Slayer") highestRank = "Degen Survivor";
+      else if (highestRank == "Trench Rookie") highestRank = "Trench Rookie";
     }
 
     function keyPressed() {
@@ -279,14 +279,14 @@
         fill(255, 100, 0);
         ellipse(10, 40, 10, this.boostTimer > 0 ? 20 : 15);
         if (this.boostTimer > 0) {
-          fill(0, 255, 0, 100);
+          fill(0, 200, 0, 100);
           ellipse(10, 45, 15, 10);
         }
         
         fill(0, 200, 0);
         rect(15, 20, 20, 30, 5);
         
-        fill(255, 0, 0);
+        fill(150, 0, 0); // Smutsigare mantel
         beginShape();
         vertex(15, 20);
         vertex(35, 20);
@@ -342,7 +342,7 @@
         ellipse(10, 40, 8, 10);
         fill(0, 150, 0);
         rect(15, 20, 20, 30, 5);
-        fill(200, 0, 0);
+        fill(100, 0, 0);
         beginShape();
         vertex(15, 20);
         vertex(35, 20);
@@ -416,7 +416,7 @@
       show() {
         push();
         textSize(25);
-        fill(0);
+        fill(255);
         text(this.emoji, this.x, this.y + 25);
         pop();
       }
@@ -435,7 +435,7 @@
       show() {
         push();
         textSize(25);
-        fill(0, 255, 0);
+        fill(0, 200, 0);
         text("💨", this.x, this.y + 25);
         pop();
       }
@@ -450,16 +450,16 @@
         this.y = height - (isBig ? 190 : 140);
         this.w = isBig ? 60 : 50;
         this.h = isBig ? 100 : 50;
-        this.type = type; // 0: toalett, 1: stinkbomb, 2: råtta
+        this.type = type; // 0: rug bomb, 1: scam rat, 2: dead pump
         this.isBig = isBig;
       }
       show() {
         push();
         textSize(this.h);
-        fill(0);
-        if (this.type === 0) text("🚽", this.x, this.y + this.h); // Toalett
-        else if (this.type === 1) text("💣", this.x, this.y + this.h); // Stinkbomb
-        else text("🐀", this.x, this.y + this.h); // Råtta
+        fill(255);
+        if (this.type === 0) text("💣", this.x, this.y + this.h); // Rug bomb
+        else if (this.type === 1) text("🐀", this.x, this.y + this.h); // Scam rat
+        else text("📉", this.x, this.y + this.h); // Dead pump
         pop();
       }
       update() {
@@ -477,7 +477,7 @@
       show() {
         push();
         textSize(this.size);
-        fill(0, 255, 0, 50);
+        fill(0, 200, 0, 50);
         text("💨", this.x, this.y);
         pop();
       }
@@ -500,7 +500,7 @@
       }
       show() {
         push();
-        fill(255, 255, 255, 200);
+        fill(80, 80, 80, 200); // Mörkgrå smog
         noStroke();
         ellipse(this.x, this.y, this.size, this.size * 0.6);
         ellipse(this.x + this.size * 0.3, this.y - this.size * 0.2, this.size * 0.8, this.size * 0.5);
@@ -517,26 +517,30 @@
       }
     }
 
-    class Star {
+    class TokenRest {
       constructor() {
         this.x = random(width);
         this.y = random(height - 120);
-        this.size = random(2, 5);
+        this.size = random(5, 10);
         this.speed = random(0.1, 0.5);
+        this.opacity = random(50, 255);
       }
       show() {
         push();
-        fill(255, 255, 150);
+        fill(255, 100, 100, this.opacity); // Rödaktiga rester
         noStroke();
-        ellipse(this.x, this.y, this.size, this.size);
+        textSize(this.size);
+        text("💸", this.x, this.y);
         pop();
       }
       update() {
         this.x -= this.speed;
-        if (this.x < 0) {
+        this.opacity -= 1; // Fade out
+        if (this.x < 0 || this.opacity <= 0) {
           this.x = width;
           this.y = random(height - 120);
           this.speed = random(0.1, 0.5);
+          this.opacity = random(50, 255);
         }
       }
     }

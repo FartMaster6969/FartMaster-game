@@ -21,12 +21,12 @@
   <button id="restartButton" onclick="resetGame()">Restart</button>
   <script>
     let player;
-    let gains = []; // Ersätter fuels
+    let gains = [];
     let obstacles = [];
     let farts = [];
     let clouds = [];
     let powerUps = [];
-    let gainCount = 0; // Ersätter fuelCount
+    let gainCount = 0;
     let gameOver = false;
     let highScore = 0;
     let gameStarted = false;
@@ -37,6 +37,7 @@
     let highestRank = "Trench Rookie";
     let coinAngle = 0;
     let tokenRest = [];
+    let twitterIconX, twitterIconY;
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -52,6 +53,8 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
+      twitterIconX = width - 40;
+      twitterIconY = height - 30;
     }
 
     function draw() {
@@ -117,16 +120,16 @@
 
         if (frameCount % 50 === 0) {
           let chance = random(1);
-          if (chance < 0.80) gains.push(new Gain(1, "📈")); // Small Pump
-          else if (chance < 0.90) gains.push(new Gain(3, "💵")); // Cash Drop
-          else if (chance < 0.97) gains.push(new Gain(5, "📈")); // Big Pump
-          else gains.push(new Gain(10, "💵")); // Fat Stack
+          if (chance < 0.80) gains.push(new Gain(1, "📈"));
+          else if (chance < 0.90) gains.push(new Gain(3, "💵"));
+          else if (chance < 0.97) gains.push(new Gain(5, "📈"));
+          else gains.push(new Gain(10, "💵"));
         }
         if (frameCount % 200 === 0) {
           powerUps.push(new PowerUp());
         }
         if (frameCount % 100 === 0) {
-          let obstacleType = floor(random(4)); // 0: rug bomb, 1: scam rat, 2: dead pump, 3: rug matta
+          let obstacleType = floor(random(4));
           obstacles.push(new Obstacle(obstacleType, random(1) > 0.5));
         }
 
@@ -194,6 +197,8 @@
         text(`Rank: ${highestRank}`, width / 2, height / 2 + 20);
         document.getElementById("restartButton").style.display = "block";
       }
+
+      drawTwitterIcon(twitterIconX, twitterIconY); // Ny Twitter-ikon
     }
 
     function drawCoin(x, y) {
@@ -213,6 +218,25 @@
       noStroke();
       pop();
       coinAngle += 0.05;
+    }
+
+    function drawTwitterIcon(x, y) {
+      push();
+      translate(x, y);
+      fill(29, 161, 242); // Twitter-blå
+      ellipse(0, 0, 30, 30);
+      fill(255);
+      textSize(18);
+      textAlign(CENTER, CENTER);
+      text("𝕏", 0, 2); // X-ikon
+      pop();
+    }
+
+    function mousePressed() {
+      let twitterDist = dist(mouseX, mouseY, twitterIconX, twitterIconY);
+      if (twitterDist < 15) {
+        window.open("https://x.com/FartMasterGame", "_blank");
+      }
     }
 
     function endGame() {
@@ -449,17 +473,17 @@
         this.y = height - (isBig ? 190 : 140);
         this.w = isBig ? 60 : 50;
         this.h = isBig ? 100 : 50;
-        this.type = type; // 0: rug bomb, 1: scam rat, 2: dead pump, 3: rug matta
+        this.type = type;
         this.isBig = isBig;
       }
       show() {
         push();
         textSize(this.h);
         fill(255);
-        if (this.type === 0) text("💣", this.x, this.y + this.h); // Rug bomb
-        else if (this.type === 1) text("🐀", this.x, this.y + this.h); // Scam rat
-        else if (this.type === 2) text("📉", this.x, this.y + this.h); // Dead pump
-        else text("🧸", this.x, this.y + this.h); // Rug matta
+        if (this.type === 0) text("💣", this.x, this.y + this.h);
+        else if (this.type === 1) text("🐀", this.x, this.y + this.h);
+        else if (this.type === 2) text("📉", this.x, this.y + this.h);
+        else text("🧸", this.x, this.y + this.h);
         pop();
       }
       update() {
@@ -547,6 +571,8 @@
 
     function windowResized() {
       resizeCanvas(windowWidth, windowHeight);
+      twitterIconX = width - 40;
+      twitterIconY = height - 30;
     }
   </script>
 </body>

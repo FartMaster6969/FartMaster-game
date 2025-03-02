@@ -38,11 +38,12 @@
     let coinAngle = 0;
     let tokenRest = [];
     let twitterIconX, twitterIconY;
-    let dogeImg;
-    let memeCharacters = [];
+    let dogeImg, libraImg, melaniaImg;
 
     function preload() {
-      dogeImg = loadImage('images/doge.png'); // Läser in Doge-bilden
+      dogeImg = loadImage('images/doge.png');
+      libraImg = loadImage('images/libra.png'); // Ny bild för Libra
+      melaniaImg = loadImage('images/melania.png'); // Ny bild för Melania
     }
 
     function setup() {
@@ -59,9 +60,6 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
-      for (let i = 0; i < 3; i++) { // 3 Doges för variation
-        memeCharacters.push(new MemeCharacter());
-      }
       twitterIconX = width - 40;
       twitterIconY = height - 30;
     }
@@ -76,10 +74,6 @@
       for (let token of tokenRest) {
         token.show();
         token.update();
-      }
-      for (let meme of memeCharacters) {
-        meme.show();
-        meme.update();
       }
       fill(80, 40, 20);
       noStroke();
@@ -142,7 +136,7 @@
           powerUps.push(new PowerUp());
         }
         if (frameCount % 100 === 0) {
-          let obstacleType = floor(random(4));
+          let obstacleType = floor(random(6)); // 0-5: Rug Bomb, Scam Rat, Dead Pump, Rug Matta, Libra, Melania
           obstacles.push(new Obstacle(obstacleType, random(1) > 0.5));
         }
 
@@ -181,6 +175,9 @@
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
         drawCoin(width / 2, 65);
+        textSize(16);
+        fill(255, 0, 255); // Neon-lila
+        text("CA: soon", width / 2, 95);
       } else if (fartScene) {
         player.showDead();
         if (fartEffect > 0) {
@@ -326,9 +323,13 @@
         beginShape();
         vertex(15, 20);
         vertex(35, 20);
-        vertex(30 + sin(this.armAngle) * 5, 40);
-        vertex(20 - sin(this.armAngle) * 5, 40);
+        vertex(35 + sin(this.armAngle) * 5, 40);
+        vertex(15 - sin(this.armAngle) * 5, 40);
         endShape(CLOSE);
+        stroke(100);
+        strokeWeight(2);
+        line(15, 20, 35, 20);
+        noStroke();
         
         fill(255, 200, 150);
         ellipse(25, 15, 20, 20);
@@ -338,10 +339,12 @@
         ellipse(25, 10, 10, 5);
         
         fill(255);
-        ellipse(22, 13, 6, 6); ellipse(28, 13, 6, 6);
+        ellipse(22, 13, 6, 6);
+        ellipse(28, 13, 6, 6);
         if (frameCount % this.blinkTimer > 5) {
           fill(0);
-          ellipse(22, 13, 3, 3); ellipse(28, 13, 3, 3);
+          ellipse(22, 13, 3, 3);
+          ellipse(28, 13, 3, 3);
         }
         
         noFill();
@@ -361,6 +364,11 @@
         line(20, 50, 20 + sin(this.legAngle) * 5, 60);
         line(30, 50, 30 - sin(this.legAngle) * 5, 60);
         noStroke();
+        
+        fill(0, 255, 0); // Cyberöga
+        ellipse(25, 10, 8, 8);
+        fill(255);
+        ellipse(25, 10, 4, 4);
         
         pop();
         if (this.velocity === 0) {
@@ -491,12 +499,18 @@
       }
       show() {
         push();
-        textSize(this.h);
-        fill(255);
-        if (this.type === 0) text("💣", this.x, this.y + this.h);
-        else if (this.type === 1) text("🐀", this.x, this.y + this.h);
-        else if (this.type === 2) text("📉", this.x, this.y + this.h);
-        else text("🧸", this.x, this.y + this.h);
+        if (this.type < 4) {
+          textSize(this.h);
+          fill(255);
+          if (this.type === 0) text("💣", this.x, this.y + this.h); // Rug Bomb
+          else if (this.type === 1) text("🐀", this.x, this.y + this.h); // Scam Rat
+          else if (this.type === 2) text("📉", this.x, this.y + this.h); // Dead Pump
+          else text("🧸", this.x, this.y + this.h); // Rug Matta
+        } else {
+          imageMode(CENTER);
+          if (this.type === 4) image(libraImg, this.x + this.w / 2, this.y + this.h / 2, this.w, this.h); // Libra
+          else if (this.type === 5) image(melaniaImg, this.x + this.w / 2, this.y + this.h / 2, this.w, this.h); // Melania
+        }
         pop();
       }
       update() {
@@ -587,12 +601,12 @@
         this.x = random(width);
         this.y = random(50, height - 200);
         this.speed = random(0.5, 1);
-        this.size = 50; // Fast storlek för bilden
+        this.size = 50;
       }
       show() {
         push();
         translate(this.x, this.y);
-        image(dogeImg, 0, 0, this.size, this.size); // Rita Doge-bilden
+        image(dogeImg, 0, 0, this.size, this.size);
         pop();
       }
       update() {

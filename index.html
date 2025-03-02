@@ -39,14 +39,16 @@
     let tokenRest = [];
     let twitterIconX, twitterIconY;
     let libraImg, melaniaImg, angelDogeImg, mitchiAngelImg, solanaAngelImg;
+    let memeCharacters = []; // Global array
 
     function preload() {
       try {
         libraImg = loadImage('images/libra_hinder.png');
         melaniaImg = loadImage('images/melania_hinder.png');
-        angelDogeImg = loadImage('images/angel_doge.png'); // Uppdaterat namn
+        angelDogeImg = loadImage('images/angel_doge.png');
         mitchiAngelImg = loadImage('images/mitchi_angel.png');
         solanaAngelImg = loadImage('images/solana_angel.png');
+        console.log("Images loaded:", { libraImg, melaniaImg, angelDogeImg, mitchiAngelImg, solanaAngelImg });
       } catch (error) {
         console.error("Error loading images:", error);
       }
@@ -66,10 +68,14 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
-      for (let i = 0; i < 6; i++) { // 2 av varje ängel
-        if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0)); // Angel Doge
-        else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1)); // Angel Mitchi
-        else memeCharacters.push(new MemeCharacter(2)); // Angel Solana
+      if (angelDogeImg && mitchiAngelImg && solanaAngelImg) {
+        for (let i = 0; i < 6; i++) {
+          if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0)); // Angel Doge
+          else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1)); // Angel Mitchi
+          else memeCharacters.push(new MemeCharacter(2)); // Angel Solana
+        }
+      } else {
+        console.error("One or more angel images failed to load, skipping meme characters.");
       }
       twitterIconX = width - 40;
       twitterIconY = height - 30;
@@ -618,7 +624,7 @@
         this.y = random(50, height - 200);
         this.speed = random(0.5, 1);
         this.type = type; // 0: Angel Doge, 1: Angel Mitchi, 2: Angel Solana
-        this.size = 80; // Ökat till 80px för större änglar
+        this.size = 80; // Större änglar
       }
       show() {
         push();

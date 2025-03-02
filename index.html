@@ -38,15 +38,18 @@
     let coinAngle = 0;
     let tokenRest = [];
     let twitterIconX, twitterIconY;
-    let dogeImg, libraImg, melaniaImg, dogeAngelImg, mitchiAngelImg, solanaAngelImg;
+    let libraImg, melaniaImg, angelDogeImg, mitchiAngelImg, solanaAngelImg;
 
     function preload() {
-      dogeImg = loadImage('images/doge.png');
-      libraImg = loadImage('images/libra_hinder.png');
-      melaniaImg = loadImage('images/melania_hinder.png');
-      dogeAngelImg = loadImage('images/doge_angel.png'); // Ängla-Doge
-      mitchiAngelImg = loadImage('images/mitchi_angel.png'); // Ängla-Mitchi
-      solanaAngelImg = loadImage('images/solana_angel.png'); // Ängla-Solana
+      try {
+        libraImg = loadImage('images/libra_hinder.png');
+        melaniaImg = loadImage('images/melania_hinder.png');
+        angelDogeImg = loadImage('images/angel_doge.png'); // Uppdaterat namn
+        mitchiAngelImg = loadImage('images/mitchi_angel.png');
+        solanaAngelImg = loadImage('images/solana_angel.png');
+      } catch (error) {
+        console.error("Error loading images:", error);
+      }
     }
 
     function setup() {
@@ -63,16 +66,17 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
-      for (let i = 0; i < 6; i++) { // 2 av varje ängel för variation
-        if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0)); // Doge
-        else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1)); // Mitchi
-        else memeCharacters.push(new MemeCharacter(2)); // Solana
+      for (let i = 0; i < 6; i++) { // 2 av varje ängel
+        if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0)); // Angel Doge
+        else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1)); // Angel Mitchi
+        else memeCharacters.push(new MemeCharacter(2)); // Angel Solana
       }
       twitterIconX = width - 40;
       twitterIconY = height - 30;
     }
 
     function draw() {
+      background(10, 10, 30); // Säkerställer att canvas inte är vit
       for (let i = 0; i < height; i++) {
         let inter = map(i, 0, height, 0, 1);
         let c = lerpColor(color(50, 50, 100), color(10, 10, 30), inter);
@@ -84,8 +88,8 @@
         token.update();
       }
       for (let meme of memeCharacters) {
-        meme.show();
-        meme.update();
+        if (meme) meme.show();
+        if (meme) meme.update();
       }
       fill(80, 40, 20);
       noStroke();
@@ -613,15 +617,15 @@
         this.x = random(width);
         this.y = random(50, height - 200);
         this.speed = random(0.5, 1);
-        this.type = type; // 0: Doge, 1: Mitchi, 2: Solana
-        this.size = 50;
+        this.type = type; // 0: Angel Doge, 1: Angel Mitchi, 2: Angel Solana
+        this.size = 80; // Ökat till 80px för större änglar
       }
       show() {
         push();
         translate(this.x, this.y);
-        if (this.type === 0) image(dogeAngelImg, 0, 0, this.size, this.size); // Ängla-Doge
-        else if (this.type === 1) image(mitchiAngelImg, 0, 0, this.size, this.size); // Ängla-Mitchi
-        else image(solanaAngelImg, 0, 0, this.size, this.size); // Ängla-Solana
+        if (this.type === 0 && angelDogeImg) image(angelDogeImg, 0, 0, this.size, this.size);
+        else if (this.type === 1 && mitchiAngelImg) image(mitchiAngelImg, 0, 0, this.size, this.size);
+        else if (this.type === 2 && solanaAngelImg) image(solanaAngelImg, 0, 0, this.size, this.size);
         pop();
       }
       update() {

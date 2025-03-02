@@ -38,6 +38,7 @@
     let coinAngle = 0;
     let tokenRest = [];
     let twitterIconX, twitterIconY;
+    let memeCharacters = [];
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -53,6 +54,9 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
+      for (let i = 0; i < 3; i++) { // 3 karaktärer: Doge, Pepe, Giga
+        memeCharacters.push(new MemeCharacter(i));
+      }
       twitterIconX = width - 40;
       twitterIconY = height - 30;
     }
@@ -67,6 +71,10 @@
       for (let token of tokenRest) {
         token.show();
         token.update();
+      }
+      for (let meme of memeCharacters) {
+        meme.show();
+        meme.update();
       }
       fill(80, 40, 20);
       noStroke();
@@ -198,7 +206,7 @@
         document.getElementById("restartButton").style.display = "block";
       }
 
-      drawTwitterIcon(twitterIconX, twitterIconY); // Ny Twitter-ikon
+      drawTwitterIcon(twitterIconX, twitterIconY);
     }
 
     function drawCoin(x, y) {
@@ -223,12 +231,12 @@
     function drawTwitterIcon(x, y) {
       push();
       translate(x, y);
-      fill(29, 161, 242); // Twitter-blå
+      fill(29, 161, 242);
       ellipse(0, 0, 30, 30);
       fill(255);
       textSize(18);
       textAlign(CENTER, CENTER);
-      text("𝕏", 0, 2); // X-ikon
+      text("𝕏", 0, 2);
       pop();
     }
 
@@ -565,6 +573,65 @@
           this.y = random(height - 120);
           this.speed = random(0.1, 0.5);
           this.opacity = random(50, 255);
+        }
+      }
+    }
+
+    class MemeCharacter {
+      constructor(type) {
+        this.x = random(width);
+        this.y = random(50, height - 200);
+        this.speed = random(0.5, 1);
+        this.size = random(50, 80);
+        this.type = type; // 0: Doge, 1: Pepe, 2: Giga Chad
+      }
+      show() {
+        push();
+        translate(this.x, this.y);
+        scale(0.5); // Skalar ner för att passa bakgrunden
+        if (this.type === 0) { // Doge
+          fill(245, 222, 179); // Ljusbrun
+          ellipse(0, 0, this.size * 1.5, this.size); // Huvud
+          fill(139, 69, 19); // Mörkbrun
+          ellipse(-this.size * 0.5, -this.size * 0.2, this.size * 0.5, this.size * 0.3); // Vänster öra
+          ellipse(this.size * 0.5, -this.size * 0.2, this.size * 0.5, this.size * 0.3); // Höger öra
+          fill(0);
+          ellipse(-this.size * 0.2, -this.size * 0.1, 10, 10); // Vänster öga
+          ellipse(this.size * 0.2, -this.size * 0.1, 10, 10); // Höger öga
+          arc(0, this.size * 0.2, 20, 10, 0, PI); // Mun
+        } else if (this.type === 1) { // Pepe
+          fill(0, 255, 0); // Grön
+          ellipse(0, 0, this.size * 1.2, this.size * 1.2); // Huvud
+          fill(255);
+          ellipse(-this.size * 0.3, -this.size * 0.3, this.size * 0.4, this.size * 0.6); // Vänster öga
+          ellipse(this.size * 0.3, -this.size * 0.3, this.size * 0.4, this.size * 0.6); // Höger öga
+          fill(0);
+          ellipse(-this.size * 0.3, -this.size * 0.3, 10, 10); // Vänster pupill
+          ellipse(this.size * 0.3, -this.size * 0.3, 10, 10); // Höger pupill
+          stroke(0);
+          strokeWeight(2);
+          arc(0, this.size * 0.3, this.size * 0.5, this.size * 0.3, PI, TWO_PI); // Mun
+          noStroke();
+        } else { // Giga Chad
+          fill(210, 180, 140); // Hudfärg
+          rect(-this.size * 0.5, -this.size * 0.5, this.size, this.size, 10); // Huvud
+          fill(0);
+          rect(-this.size * 0.4, -this.size * 0.7, this.size * 0.8, this.size * 0.4); // Hår
+          ellipse(-this.size * 0.2, -this.size * 0.1, 10, 10); // Vänster öga
+          ellipse(this.size * 0.2, -this.size * 0.1, 10, 10); // Höger öga
+          stroke(0);
+          strokeWeight(2);
+          line(-this.size * 0.2, this.size * 0.2, this.size * 0.2, this.size * 0.2); // Mun
+          noStroke();
+        }
+        pop();
+      }
+      update() {
+        this.x -= this.speed;
+        if (this.x < -this.size) {
+          this.x = width + this.size;
+          this.y = random(50, height - 200);
+          this.speed = random(0.5, 1);
         }
       }
     }

@@ -38,12 +38,15 @@
     let coinAngle = 0;
     let tokenRest = [];
     let twitterIconX, twitterIconY;
-    let dogeImg, libraImg, melaniaImg;
+    let dogeImg, libraImg, melaniaImg, dogeAngelImg, mitchiAngelImg, solanaAngelImg;
 
     function preload() {
       dogeImg = loadImage('images/doge.png');
-      libraImg = loadImage('images/libra.png');
-      melaniaImg = loadImage('images/melania.png');
+      libraImg = loadImage('images/libra_hinder.png');
+      melaniaImg = loadImage('images/melania_hinder.png');
+      dogeAngelImg = loadImage('images/doge_angel.png'); // Ängla-Doge
+      mitchiAngelImg = loadImage('images/mitchi_angel.png'); // Ängla-Mitchi
+      solanaAngelImg = loadImage('images/solana_angel.png'); // Ängla-Solana
     }
 
     function setup() {
@@ -60,6 +63,11 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
+      for (let i = 0; i < 6; i++) { // 2 av varje ängel för variation
+        if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0)); // Doge
+        else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1)); // Mitchi
+        else memeCharacters.push(new MemeCharacter(2)); // Solana
+      }
       twitterIconX = width - 40;
       twitterIconY = height - 30;
     }
@@ -74,6 +82,10 @@
       for (let token of tokenRest) {
         token.show();
         token.update();
+      }
+      for (let meme of memeCharacters) {
+        meme.show();
+        meme.update();
       }
       fill(80, 40, 20);
       noStroke();
@@ -597,16 +609,19 @@
     }
 
     class MemeCharacter {
-      constructor() {
+      constructor(type) {
         this.x = random(width);
         this.y = random(50, height - 200);
         this.speed = random(0.5, 1);
+        this.type = type; // 0: Doge, 1: Mitchi, 2: Solana
         this.size = 50;
       }
       show() {
         push();
         translate(this.x, this.y);
-        image(dogeImg, 0, 0, this.size, this.size);
+        if (this.type === 0) image(dogeAngelImg, 0, 0, this.size, this.size); // Ängla-Doge
+        else if (this.type === 1) image(mitchiAngelImg, 0, 0, this.size, this.size); // Ängla-Mitchi
+        else image(solanaAngelImg, 0, 0, this.size, this.size); // Ängla-Solana
         pop();
       }
       update() {

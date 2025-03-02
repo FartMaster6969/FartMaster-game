@@ -39,7 +39,7 @@
     let tokenRest = [];
     let twitterIconX, twitterIconY;
     let libraImg, melaniaImg, angelDogeImg, mitchiAngelImg, solanaAngelImg;
-    let memeCharacters = []; // Global array
+    let memeCharacters = [];
 
     function preload() {
       try {
@@ -70,9 +70,9 @@
       }
       if (angelDogeImg && mitchiAngelImg && solanaAngelImg) {
         for (let i = 0; i < 6; i++) {
-          if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0)); // Angel Doge
-          else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1)); // Angel Mitchi
-          else memeCharacters.push(new MemeCharacter(2)); // Angel Solana
+          if (i % 3 === 0) memeCharacters.push(new MemeCharacter(0));
+          else if (i % 3 === 1) memeCharacters.push(new MemeCharacter(1));
+          else memeCharacters.push(new MemeCharacter(2));
         }
       } else {
         console.error("One or more angel images failed to load, skipping meme characters.");
@@ -82,7 +82,7 @@
     }
 
     function draw() {
-      background(10, 10, 30); // Säkerställer att canvas inte är vit
+      background(10, 10, 30);
       for (let i = 0; i < height; i++) {
         let inter = map(i, 0, height, 0, 1);
         let c = lerpColor(color(50, 50, 100), color(10, 10, 30), inter);
@@ -325,119 +325,135 @@
         this.blinkTimer = random(60, 120);
         this.boostTimer = 0;
       }
+
       show() {
         push();
         translate(this.x, this.y);
-        
-        fill(150, 150, 150);
-        rect(5, 20, 10, 20, 5);
-        fill(255, 100, 0);
-        ellipse(10, 40, 10, this.boostTimer > 0 ? 20 : 15);
-        if (this.boostTimer > 0) {
-          fill(0, 200, 0, 100);
-          ellipse(10, 45, 15, 10);
-        }
-        
-        fill(0, 200, 0);
-        rect(15, 20, 20, 30, 5);
-        
-        fill(150, 0, 0);
+
+        // Soldatkropp (kamouflagegrön uniform)
+        fill(34, 139, 34); // Skogsgrön
+        rect(10, 20, 20, 30, 5); // Kropp
+
+        // Armar (rörliga med armAngle)
+        fill(34, 139, 34);
         beginShape();
-        vertex(15, 20);
-        vertex(35, 20);
-        vertex(35 + sin(this.armAngle) * 5, 40);
-        vertex(15 - sin(this.armAngle) * 5, 40);
+        vertex(10, 20);
+        vertex(30, 20);
+        vertex(30 + sin(this.armAngle) * 5, 35);
+        vertex(10 - sin(this.armAngle) * 5, 35);
         endShape(CLOSE);
-        stroke(100);
+        stroke(20, 80, 20); // Mörkare grön för detaljer
         strokeWeight(2);
-        line(15, 20, 35, 20);
+        line(10, 25, 8 + sin(this.armAngle) * 5, 35); // Vänster arm
+        line(30, 25, 32 - sin(this.armAngle) * 5, 35); // Höger arm
         noStroke();
-        
-        fill(255, 200, 150);
-        ellipse(25, 15, 20, 20);
-        
-        fill(this.boostTimer > 0 || frameCount % 20 < 10 ? 255 : 200, 215, 0);
-        triangle(20, 10, 25, 5, 30, 10);
-        ellipse(25, 10, 10, 5);
-        
+
+        // Ben (rörliga med legAngle)
+        stroke(20, 80, 20);
+        strokeWeight(4);
+        line(15, 50, 15 + sin(this.legAngle) * 5, 60); // Vänster ben
+        line(25, 50, 25 - sin(this.legAngle) * 5, 60); // Höger ben
+        noStroke();
+
+        // Hjälm
+        fill(47, 79, 47); // Mörkgrön hjälm
+        arc(20, 15, 25, 25, PI, TWO_PI); // Rundad topp
+        rect(7.5, 15, 25, 5); // Kant nedtill
+
+        // Ansikte
+        fill(210, 180, 140); // Hudfärg
+        ellipse(20, 18, 16, 16); // Huvud
+
+        // Ögon (med blink)
         fill(255);
-        ellipse(22, 13, 6, 6);
-        ellipse(28, 13, 6, 6);
+        ellipse(17, 16, 5, 5); // Vänster öga
+        ellipse(23, 16, 5, 5); // Höger öga
         if (frameCount % this.blinkTimer > 5) {
           fill(0);
-          ellipse(22, 13, 3, 3);
-          ellipse(28, 13, 3, 3);
+          ellipse(17, 16, 2, 2); // Vänster pupill
+          ellipse(23, 16, 2, 2); // Höger pupill
         }
-        
+
+        // Mun
         noFill();
         stroke(0);
-        strokeWeight(2);
-        arc(25, 18, 8, 4, 0, PI);
+        strokeWeight(1);
+        arc(20, 22, 6, 4, 0, PI); // Leende
         noStroke();
-        
-        stroke(0, 200, 0);
-        strokeWeight(4);
-        line(15, 25, 10 + sin(this.armAngle) * 5, 35);
-        line(35, 25, 40 - sin(this.armAngle) * 5, 35);
-        noStroke();
-        
-        stroke(0, 200, 0);
-        strokeWeight(4);
-        line(20, 50, 20 + sin(this.legAngle) * 5, 60);
-        line(30, 50, 30 - sin(this.legAngle) * 5, 60);
-        noStroke();
-        
-        fill(0, 255, 0);
-        ellipse(25, 10, 8, 8);
-        fill(255);
-        ellipse(25, 10, 4, 4);
-        
+
+        // Boost-effekt (om aktiv)
+        if (this.boostTimer > 0) {
+          fill(0, 200, 0, 100);
+          ellipse(20, 55, 20, 15); // Grön flamma under fötterna
+        }
+
         pop();
+
+        // Animationsuppdateringar
         if (this.velocity === 0) {
           this.legAngle += 0.2;
           this.armAngle += 0.1;
         }
         if (frameCount % this.blinkTimer === 0) this.blinkTimer = random(60, 120);
       }
+
       showDead() {
         push();
         translate(this.x, this.y);
-        fill(100, 100, 100);
-        rect(5, 20, 10, 20, 5);
-        fill(150, 50, 0);
-        ellipse(10, 40, 8, 10);
-        fill(0, 150, 0);
-        rect(15, 20, 20, 30, 5);
-        fill(100, 0, 0);
+
+        // Soldatkropp (skadad, mörkare färg)
+        fill(20, 80, 20); // Mörkare grön
+        rect(10, 20, 20, 30, 5); // Kropp
+
+        // Armar (hänger ned)
+        fill(20, 80, 20);
         beginShape();
-        vertex(15, 20);
-        vertex(35, 20);
+        vertex(10, 20);
+        vertex(30, 20);
         vertex(30, 40);
-        vertex(20, 40);
+        vertex(10, 40);
         endShape(CLOSE);
-        fill(200, 150, 100);
-        ellipse(25, 15, 20, 20);
-        fill(200, 165, 0);
-        triangle(20, 10, 25, 5, 30, 10);
-        ellipse(25, 10, 10, 5);
-        stroke(0);
+        stroke(10, 50, 10);
         strokeWeight(2);
-        line(20, 13, 24, 13);
-        line(26, 13, 30, 13);
+        line(10, 25, 8, 40); // Vänster arm
+        line(30, 25, 32, 40); // Höger arm
         noStroke();
-        arc(25, 20, 8, 4, PI, TWO_PI);
-        stroke(0, 150, 0);
+
+        // Ben (stillastående)
+        stroke(10, 50, 10);
         strokeWeight(4);
-        line(15, 25, 10, 35);
-        line(35, 25, 40, 35);
+        line(15, 50, 15, 60); // Vänster ben
+        line(25, 50, 25, 60); // Höger ben
         noStroke();
-        stroke(0, 150, 0);
-        strokeWeight(4);
-        line(20, 50, 20, 60);
-        line(30, 50, 30, 60);
+
+        // Hjälm (snett)
+        fill(30, 50, 30);
+        push();
+        rotate(-0.2); // Lutad hjälm
+        arc(22, 15, 25, 25, PI, TWO_PI); // Rundad topp
+        rect(9.5, 15, 25, 5); // Kant nedtill
+        pop();
+
+        // Ansikte (blekt)
+        fill(180, 150, 120); // Blekt hudfärg
+        ellipse(20, 18, 16, 16); // Huvud
+
+        // Ögon (stängda)
+        stroke(0);
+        strokeWeight(1);
+        line(16, 16, 20, 16); // Vänster öga
+        line(22, 16, 26, 16); // Höger öga
         noStroke();
+
+        // Mun (ledsen)
+        stroke(0);
+        strokeWeight(1);
+        arc(20, 23, 6, 4, PI, TWO_PI); // Nedåtböjd mun
+        noStroke();
+
         pop();
       }
+
       update() {
         this.velocity += this.gravity;
         this.y += this.velocity;
@@ -451,9 +467,11 @@
         this.x = constrain(this.x, 0, width - this.width);
         if (this.boostTimer > 0) this.boostTimer--;
       }
+
       updateStart() {
         this.y = height - 140;
       }
+
       jump() {
         if (this.jumpsLeft > 0) {
           this.velocity = -12;
@@ -461,6 +479,7 @@
           this.jumpFart = 10;
         }
       }
+
       hits(obj) {
         let px = this.x;
         let py = this.y;
@@ -524,14 +543,14 @@
         if (this.type < 4) {
           textSize(this.h);
           fill(255);
-          if (this.type === 0) text("💣", this.x, this.y + this.h); // Rug Bomb
-          else if (this.type === 1) text("🐀", this.x, this.y + this.h); // Scam Rat
-          else if (this.type === 2) text("📉", this.x, this.y + this.h); // Dead Pump
-          else text("🧸", this.x, this.y + this.h); // Rug Matta
+          if (this.type === 0) text("💣", this.x, this.y + this.h);
+          else if (this.type === 1) text("🐀", this.x, this.y + this.h);
+          else if (this.type === 2) text("📉", this.x, this.y + this.h);
+          else text("🧸", this.x, this.y + this.h);
         } else {
           imageMode(CENTER);
-          if (this.type === 4) image(libraImg, this.x + this.w / 2, this.y + this.h / 2, this.w, this.h); // Libra
-          else if (this.type === 5) image(melaniaImg, this.x + this.w / 2, this.y + this.h / 2, this.w, this.h); // Melania
+          if (this.type === 4) image(libraImg, this.x + this.w / 2, this.y + this.h / 2, this.w, this.h);
+          else if (this.type === 5) image(melaniaImg, this.x + this.w / 2, this.y + this.h / 2, this.w, this.h);
         }
         pop();
       }
@@ -623,8 +642,8 @@
         this.x = random(width);
         this.y = random(50, height - 200);
         this.speed = random(0.5, 1);
-        this.type = type; // 0: Angel Doge, 1: Angel Mitchi, 2: Angel Solana
-        this.size = 80; // Större änglar
+        this.type = type;
+        this.size = 80;
       }
       show() {
         push();

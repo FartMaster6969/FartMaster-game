@@ -196,7 +196,6 @@
         text(`Trench Gains: ${gainCount}`, 100, 30);
         text(`Highscore: ${highScore}`, width - 100, 30);
         text(`Rank: ${highestRank}`, width / 2, 30);
-        drawCoin(width / 2, 65);
         textSize(16);
         fill(255, 0, 255);
         text("CA: soon", width / 2, 95);
@@ -329,12 +328,11 @@
       show() {
         push();
         translate(this.x, this.y);
+        scale(5); // Tillfälligt stor för skärmdump
 
-        // Soldatkropp (kamouflagegrön uniform)
-        fill(34, 139, 34); // Skogsgrön
-        rect(10, 20, 20, 30, 5); // Kropp
+        fill(34, 139, 34);
+        rect(10, 20, 20, 30, 5);
 
-        // Armar (rörliga med armAngle)
         fill(34, 139, 34);
         beginShape();
         vertex(10, 20);
@@ -342,54 +340,47 @@
         vertex(30 + sin(this.armAngle) * 5, 35);
         vertex(10 - sin(this.armAngle) * 5, 35);
         endShape(CLOSE);
-        stroke(20, 80, 20); // Mörkare grön för detaljer
+        stroke(20, 80, 20);
         strokeWeight(2);
-        line(10, 25, 8 + sin(this.armAngle) * 5, 35); // Vänster arm
-        line(30, 25, 32 - sin(this.armAngle) * 5, 35); // Höger arm
+        line(10, 25, 8 + sin(this.armAngle) * 5, 35);
+        line(30, 25, 32 - sin(this.armAngle) * 5, 35);
         noStroke();
 
-        // Ben (rörliga med legAngle)
         stroke(20, 80, 20);
         strokeWeight(4);
-        line(15, 50, 15 + sin(this.legAngle) * 5, 60); // Vänster ben
-        line(25, 50, 25 - sin(this.legAngle) * 5, 60); // Höger ben
+        line(15, 50, 15 + sin(this.legAngle) * 5, 60);
+        line(25, 50, 25 - sin(this.legAngle) * 5, 60);
         noStroke();
 
-        // Hjälm
-        fill(47, 79, 47); // Mörkgrön hjälm
-        arc(20, 15, 25, 25, PI, TWO_PI); // Rundad topp
-        rect(7.5, 15, 25, 5); // Kant nedtill
+        fill(47, 79, 47);
+        arc(20, 15, 25, 25, PI, TWO_PI);
+        rect(7.5, 15, 25, 5);
 
-        // Ansikte
-        fill(210, 180, 140); // Hudfärg
-        ellipse(20, 18, 16, 16); // Huvud
+        fill(210, 180, 140);
+        ellipse(20, 18, 16, 16);
 
-        // Ögon (med blink)
         fill(255);
-        ellipse(17, 16, 5, 5); // Vänster öga
-        ellipse(23, 16, 5, 5); // Höger öga
+        ellipse(17, 16, 5, 5);
+        ellipse(23, 16, 5, 5);
         if (frameCount % this.blinkTimer > 5) {
           fill(0);
-          ellipse(17, 16, 2, 2); // Vänster pupill
-          ellipse(23, 16, 2, 2); // Höger pupill
+          ellipse(17, 16, 2, 2);
+          ellipse(23, 16, 2, 2);
         }
 
-        // Mun
         noFill();
         stroke(0);
         strokeWeight(1);
-        arc(20, 22, 6, 4, 0, PI); // Leende
+        arc(20, 22, 6, 4, 0, PI);
         noStroke();
 
-        // Boost-effekt (om aktiv)
         if (this.boostTimer > 0) {
           fill(0, 200, 0, 100);
-          ellipse(20, 55, 20, 15); // Grön flamma under fötterna
+          ellipse(20, 55, 20, 15);
         }
 
         pop();
 
-        // Animationsuppdateringar
         if (this.velocity === 0) {
           this.legAngle += 0.2;
           this.armAngle += 0.1;
@@ -401,11 +392,9 @@
         push();
         translate(this.x, this.y);
 
-        // Soldatkropp (skadad, mörkare färg)
-        fill(20, 80, 20); // Mörkare grön
-        rect(10, 20, 20, 30, 5); // Kropp
+        fill(20, 80, 20);
+        rect(10, 20, 20, 30, 5);
 
-        // Armar (hänger ned)
         fill(20, 80, 20);
         beginShape();
         vertex(10, 20);
@@ -415,40 +404,35 @@
         endShape(CLOSE);
         stroke(10, 50, 10);
         strokeWeight(2);
-        line(10, 25, 8, 40); // Vänster arm
-        line(30, 25, 32, 40); // Höger arm
+        line(10, 25, 8, 40);
+        line(30, 25, 32, 40);
         noStroke();
 
-        // Ben (stillastående)
         stroke(10, 50, 10);
         strokeWeight(4);
-        line(15, 50, 15, 60); // Vänster ben
-        line(25, 50, 25, 60); // Höger ben
+        line(15, 50, 15, 60);
+        line(25, 50, 25, 60);
         noStroke();
 
-        // Hjälm (snett)
         fill(30, 50, 30);
         push();
-        rotate(-0.2); // Lutad hjälm
-        arc(22, 15, 25, 25, PI, TWO_PI); // Rundad topp
-        rect(9.5, 15, 25, 5); // Kant nedtill
+        rotate(-0.2);
+        arc(22, 15, 25, 25, PI, TWO_PI);
+        rect(9.5, 15, 25, 5);
         pop();
 
-        // Ansikte (blekt)
-        fill(180, 150, 120); // Blekt hudfärg
-        ellipse(20, 18, 16, 16); // Huvud
+        fill(180, 150, 120);
+        ellipse(20, 18, 16, 16);
 
-        // Ögon (stängda)
         stroke(0);
         strokeWeight(1);
-        line(16, 16, 20, 16); // Vänster öga
-        line(22, 16, 26, 16); // Höger öga
+        line(16, 16, 20, 16);
+        line(22, 16, 26, 16);
         noStroke();
 
-        // Mun (ledsen)
         stroke(0);
         strokeWeight(1);
-        arc(20, 23, 6, 4, PI, TWO_PI); // Nedåtböjd mun
+        arc(20, 23, 6, 4, PI, TWO_PI);
         noStroke();
 
         pop();

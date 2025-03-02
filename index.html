@@ -42,8 +42,8 @@
 
     function preload() {
       dogeImg = loadImage('images/doge.png');
-      libraImg = loadImage('images/libra.png'); // Ny bild för Libra
-      melaniaImg = loadImage('images/melania.png'); // Ny bild för Melania
+      libraImg = loadImage('images/libra.png');
+      melaniaImg = loadImage('images/melania.png');
     }
 
     function setup() {
@@ -136,7 +136,7 @@
           powerUps.push(new PowerUp());
         }
         if (frameCount % 100 === 0) {
-          let obstacleType = floor(random(6)); // 0-5: Rug Bomb, Scam Rat, Dead Pump, Rug Matta, Libra, Melania
+          let obstacleType = floor(random(6));
           obstacles.push(new Obstacle(obstacleType, random(1) > 0.5));
         }
 
@@ -176,7 +176,7 @@
         text(`Rank: ${highestRank}`, width / 2, 30);
         drawCoin(width / 2, 65);
         textSize(16);
-        fill(255, 0, 255); // Neon-lila
+        fill(255, 0, 255);
         text("CA: soon", width / 2, 95);
       } else if (fartScene) {
         player.showDead();
@@ -365,7 +365,7 @@
         line(30, 50, 30 - sin(this.legAngle) * 5, 60);
         noStroke();
         
-        fill(0, 255, 0); // Cyberöga
+        fill(0, 255, 0);
         ellipse(25, 10, 8, 8);
         fill(255);
         ellipse(25, 10, 4, 4);

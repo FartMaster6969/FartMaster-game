@@ -38,7 +38,12 @@
     let coinAngle = 0;
     let tokenRest = [];
     let twitterIconX, twitterIconY;
+    let dogeImg;
     let memeCharacters = [];
+
+    function preload() {
+      dogeImg = loadImage('images/doge.png'); // Läser in Doge-bilden
+    }
 
     function setup() {
       createCanvas(windowWidth, windowHeight);
@@ -54,8 +59,8 @@
       for (let i = 0; i < 50; i++) {
         tokenRest.push(new TokenRest());
       }
-      for (let i = 0; i < 3; i++) { // 3 karaktärer: Doge, Pepe, Giga
-        memeCharacters.push(new MemeCharacter(i));
+      for (let i = 0; i < 3; i++) { // 3 Doges för variation
+        memeCharacters.push(new MemeCharacter());
       }
       twitterIconX = width - 40;
       twitterIconY = height - 30;
@@ -578,52 +583,16 @@
     }
 
     class MemeCharacter {
-      constructor(type) {
+      constructor() {
         this.x = random(width);
         this.y = random(50, height - 200);
         this.speed = random(0.5, 1);
-        this.size = random(50, 80);
-        this.type = type; // 0: Doge, 1: Pepe, 2: Giga Chad
+        this.size = 50; // Fast storlek för bilden
       }
       show() {
         push();
         translate(this.x, this.y);
-        scale(0.5); // Skalar ner för att passa bakgrunden
-        if (this.type === 0) { // Doge
-          fill(245, 222, 179); // Ljusbrun
-          ellipse(0, 0, this.size * 1.5, this.size); // Huvud
-          fill(139, 69, 19); // Mörkbrun
-          ellipse(-this.size * 0.5, -this.size * 0.2, this.size * 0.5, this.size * 0.3); // Vänster öra
-          ellipse(this.size * 0.5, -this.size * 0.2, this.size * 0.5, this.size * 0.3); // Höger öra
-          fill(0);
-          ellipse(-this.size * 0.2, -this.size * 0.1, 10, 10); // Vänster öga
-          ellipse(this.size * 0.2, -this.size * 0.1, 10, 10); // Höger öga
-          arc(0, this.size * 0.2, 20, 10, 0, PI); // Mun
-        } else if (this.type === 1) { // Pepe
-          fill(0, 255, 0); // Grön
-          ellipse(0, 0, this.size * 1.2, this.size * 1.2); // Huvud
-          fill(255);
-          ellipse(-this.size * 0.3, -this.size * 0.3, this.size * 0.4, this.size * 0.6); // Vänster öga
-          ellipse(this.size * 0.3, -this.size * 0.3, this.size * 0.4, this.size * 0.6); // Höger öga
-          fill(0);
-          ellipse(-this.size * 0.3, -this.size * 0.3, 10, 10); // Vänster pupill
-          ellipse(this.size * 0.3, -this.size * 0.3, 10, 10); // Höger pupill
-          stroke(0);
-          strokeWeight(2);
-          arc(0, this.size * 0.3, this.size * 0.5, this.size * 0.3, PI, TWO_PI); // Mun
-          noStroke();
-        } else { // Giga Chad
-          fill(210, 180, 140); // Hudfärg
-          rect(-this.size * 0.5, -this.size * 0.5, this.size, this.size, 10); // Huvud
-          fill(0);
-          rect(-this.size * 0.4, -this.size * 0.7, this.size * 0.8, this.size * 0.4); // Hår
-          ellipse(-this.size * 0.2, -this.size * 0.1, 10, 10); // Vänster öga
-          ellipse(this.size * 0.2, -this.size * 0.1, 10, 10); // Höger öga
-          stroke(0);
-          strokeWeight(2);
-          line(-this.size * 0.2, this.size * 0.2, this.size * 0.2, this.size * 0.2); // Mun
-          noStroke();
-        }
+        image(dogeImg, 0, 0, this.size, this.size); // Rita Doge-bilden
         pop();
       }
       update() {
